@@ -1,0 +1,29 @@
+{
+    "name": "grapesjs-template-manager",
+    "version": "1.0.0",
+    "description": "Grapesjs Template Manager",
+    "main": "dist/grapesjs-template-manager.min.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Ju99ernaut/grapesjs-template-manager.git"
+    },
+    "scripts": {
+        "start": "grapesjs-cli serve",
+        "build": "grapesjs-cli build",
+        "build:css": "node-sass src/styles.scss dist/grapesjs-template-manager.min.css --output-style compressed",
+        "bump": "npm version patch -m 'Bump v%s'"
+    },
+    "keywords": [
+        "grapesjs",
+        "plugin"
+    ],
+    "devDependencies": {
+        "grapesjs-cli": "^1.0.14",
+        "node-sass": "^4.14.1"
+    },
+    "author": "Brendon Ngirazi",
+    "license": "MIT",
+    "dependencies": {
+        "dom-to-image": "^2.6.0"
+    }
+}
