@@ -1,0 +1,42 @@
+import domtoimage from 'dom-to-image';
+
+export default (editor, opts = {}) => {
+    const cm = editor.Commands;
+
+    //some magic from gist.github.com/jed/982883
+    const uuidv4 = () => ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+
+    const getJpeg = (node, opts = {}, clb, clbErr) => {
+        domtoimage.toJpeg(node, opts)
+            .then(dataUrl => clb && clb(dataUrl))
+            .catch(err => clbErr && clbErr(err))
+    };
+
+    editor.domtoimage = domtoimage;
+
+    cm.add('get-uuidv4', () => uuidv4());
+
+    cm.add('take-screenshot', (editor, options) => {
+        const el = editor.getWrapper().getEl();
+        getJpeg(el, {
+            quality: options.quality,
+            height: 1000,
+            'cacheBust': true,
+            style: {
+                'background-color': 'white',
+                ...editor.getWrapper().getStyle()
+            },
+        }, options.clb, options.clbErr);
+    });
+
+    cm.add('save-as-template', editor => {
+        editor.store();
+    });
+
+    cm.add('delete-template', editor => {
+        sm.get(sm.getCurrent())
+            .delete(opts.onDelete, opts.onDeleteError);
+    });
+}
