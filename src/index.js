@@ -83,4 +83,8 @@ export default (editor, opts = {}) => {
     });
 
     //TODO Build the ui
+
+    editor.on('load', () => {
+        //TODO lood first page
+    });
 };

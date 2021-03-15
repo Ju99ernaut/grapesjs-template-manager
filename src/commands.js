@@ -3,6 +3,8 @@ import domtoimage from 'dom-to-image';
 export default (editor, opts = {}) => {
     const cm = editor.Commands;
 
+    editor.domtoimage = domtoimage;
+
     //some magic from gist.github.com/jed/982883
     const uuidv4 = () => ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
@@ -13,8 +15,6 @@ export default (editor, opts = {}) => {
             .then(dataUrl => clb && clb(dataUrl))
             .catch(err => clbErr && clbErr(err))
     };
-
-    editor.domtoimage = domtoimage;
 
     cm.add('get-uuidv4', () => uuidv4());
 
