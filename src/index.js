@@ -1,4 +1,7 @@
 import en from './locale/en';
+import commands from './commands';
+import storage from './storage';
+import modal from './modal';
 
 export default (editor, opts = {}) => {
     const options = {
@@ -82,7 +85,14 @@ export default (editor, opts = {}) => {
         ...options.i18n,
     });
 
-    //TODO Build the ui
+    // Load commands
+    commands(editor, options);
+
+    // Load storages
+    storage(editor, options);
+
+    // Load page manager
+    modal(editor, options);
 
     editor.on('load', () => {
         //TODO lood first page
