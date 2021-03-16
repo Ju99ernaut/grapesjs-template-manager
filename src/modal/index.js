@@ -20,8 +20,11 @@ export default (editor, opts = {}) => {
                     content = content.length ? content : $(templateManager.render());
                     mdl.setContent(content);
                     const pages = content.find('#pages-container');
-                    pages.remove();
-                    pages.append(templateManager.update(res.filter(r => !r.template)))
+                    const templates = content.find('#templates-container');
+                    pages.remove(`${this.pfx}templates-card`);
+                    templates.remove(`${this.pfx}templates-card`);
+                    pages.append(templateManager.update(res.filter(r => !r.template)));
+                    templates.append(templateManager.update(res.filter(r => r.template)), false);
                 },
                 err => console.log("Error", err));
             mdl.open();

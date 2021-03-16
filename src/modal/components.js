@@ -3,6 +3,7 @@ export class TemplateManager {
         this.editor = editor;
         this.$ = editor.$;
         this.pfx = editor.getConfig('stylePrefix');
+        this.id = editor.Storage.getConfig('id') || 'gjs-';
         this.opts = opts;
     }
 
@@ -11,13 +12,13 @@ export class TemplateManager {
         const sm = editor.Storage;
         sm.get(sm.getCurrent()).set({ idx: templateIdx, template: false });
         this.page && editor.load(res => {
+            editor.setComponents(res.components ? JSON.parse(res.components) : res.html);
+            editor.setStyle(res.styles ? JSON.parse(res.styles) : res.css);
             sm.get(sm.getCurrent()).set({
                 id: this.page,
                 idx: editor.runCommand('uuidv4'),
                 thumbnail: res.thumbnail || ''
             });
-            editor.setComponents(res.components ? JSON.parse(res.components) : res.html);
-            editor.setStyle(res.styles ? JSON.parse(res.styles) : res.css);
             editor.Modal.close();
         });
     };
@@ -88,18 +89,55 @@ export class TemplateManager {
     }
 
     _thumbsCont(thumbs) {
-        const sm = this.editor.Storage;
         const content = this.$(`<div class="${this.pfx}templates-card-2">
                 ${thumbs}
             </div>`);
+        content.find('i.fa.fa-i-cursor').on('click', e => this._editName(e));
+        content.find('i.fa.fa-trash-o').on('click', e => this._deletePage(e));
+        return content;
+    }
+
+    _pages(thumbs) {
+        const sm = this.editor.Storage;
+        const content = this._thumbsCont(thumb);
         content.find(`.${pfx}templates-card`)
             .filter((i, elm) => elm.getAttribute('data-idx') == sm.get(sm.getCurrent()).get('idx'))
             .addClass(`${pfx}templates-card-active`)
             .find('i.fa')
             .hide();
         content.find(`.${this.pfx}thumb-select`).on('click', e => this._openPage(e));
-        content.find('i.fa.fa-i-cursor').on('click', e => this._editName(e));
-        content.find('i.fa.fa-trash-o').on('click', e => this._deletePage(e));
+        return content;
+    }
+
+    _templates(thumbs) {
+        const content = this._thumbsCont(thumb);
+        content.find(`.${pfx}templates-card`)
+            .filter((i, elm) => elm.getAttribute('data-idx') == this.templateIdx)
+            .addClass(`${pfx}templates-card-active`)
+            .find('i.fa')
+            .hide();
+        content.find(`.${pfx}thumb-select`).on('click', e => this._selectTemplate(e));
+        return content;
+    }
+
+    _tabs() {
+        const { pfx, $ } = this;
+        const content = $(`<div class="${pfx}tab">
+                <button class="${pfx}tablinks active">Pages</button>
+                <button class="${pfx}tablinks">Templates</button>
+            </div>`);
+        content.find('button').on('click', e => {
+            const target = e.currentTarget;
+            if (target.innerHTML.toLowerCase() === 'pages') {
+                $('.templates-tab').hide();
+                $('#templates-container').hide();
+                $('#pages-container').show();
+            } else {
+                $('.templates-tab').show();
+                $('#templates-container').show();
+                $('#pages-container').hide();
+            }
+        });
         return content;
     }
 
@@ -108,11 +146,11 @@ export class TemplateManager {
     }
 
     render() {
-        const { pfx } = this;
-        return `<div id="pages" class="${pfx}templates ${pfx}one-bg ${pfx}two-color">
+        const { pfx, $ } = this;
+        const content = $(`<div id="pages" class="${pfx}templates ${pfx}one-bg ${pfx}two-color">
             <div class="${pfx}templates-overlay"></div>
             <div class="${pfx}templates-cont">
-                <div class="${pfx}fonts">
+                <div class="${pfx}fonts templates-tab" style="display:none">
                     <label class="${pfx}field-label" for="page-name">Name</label>
                     <div class="${pfx}field">
                         <input type="text" name="pageName" id="page-name">
@@ -128,22 +166,32 @@ export class TemplateManager {
                         </button>
                     </span>
                 </div>
-                <div class="${pfx}templates-header2">
+                <div class="${pfx}templates-header2 pages-tab">
                     Your Pages
                 </div>
+                <div class="${pfx}templates-header2 templates-tab" style="display:none">
+                    Your Templates
+                </div>
                 <div id="pages-container"></div>
+                <div id="templates-container" style="display:none"></div>
             </div>
-        </div>`;
+        </div>`);
+        content.find('#page-name').on('keyup', e => this.page = e.currentTarget.value)
+        content.find('#page-create').on('click', () => this._createPage());
+        content.find('#template-edit').on('click', () => this._openTemplate());
+        content.find(`.${pfx}templates-cont`).prepend(this._tabs());
+        return content;
     }
 
-    update(data) {
+    update(data, pages = true) {
         let thumbnailsEl = '';
+        const { pfx, id } = this;
 
         data.forEach(el => {
             const dataSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="template-preview" viewBox="0 0 1300 1100" width="99%" height="220">
                     <foreignObject width="100%" height="100%" style="pointer-events:none">
-                    <div xmlns="http://www.w3.org/1999/xhtml" ${el['gjs-html'] ? '' : 'padding-top:100%'}">
-                    ${el['gjs-html'] + '<style scoped>' + el['gjs-css'] + '</style>'}
+                    <div xmlns="http://www.w3.org/1999/xhtml" ${el[`${id}html`] ? '' : 'padding-top:100%'}">
+                    ${el[`${id}html`] + '<style scoped>' + el[`${id}css`] + '</style>'}
                     </div>
                     </foreignObject>
                 </svg>`;
@@ -165,6 +213,6 @@ export class TemplateManager {
             thumbnailsEl += this._thumbs(el.idx, thumbnailEl);
         });
 
-        return this._thumbsCont(thumbnailsEl);
+        return pages ? this._pages(thumbnailsEl) : this._templates(thumbnailsEl);
     }
 }
