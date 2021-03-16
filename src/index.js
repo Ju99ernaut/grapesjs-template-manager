@@ -1,4 +1,3 @@
-import en from './locale/en';
 import commands from './commands';
 import storage from './storage';
 import modal from './modal';
@@ -6,7 +5,6 @@ import modal from './modal';
 export default (editor, opts = {}) => {
     const options = {
         ...{
-            i18n: {},
             // default options
             // Database name
             dbName: 'gjs',
@@ -19,12 +17,6 @@ export default (editor, opts = {}) => {
 
             // Indexeddb version schema
             indexeddbVersion: 4,
-
-            // Default page id
-            defaultPage: 'Default',
-
-            // Default template id
-            defaultTemplate: 'Blank',
 
             // blank Template
             blankTemplate: {
@@ -55,12 +47,6 @@ export default (editor, opts = {}) => {
             // Content for templates modal title
             mdlTitle: 'Template Manager',
 
-            // Custom onload function used only when storage isn't indexeddb
-            onload() {},
-
-            // Custom on edit function used to edit the page name if storage isn't indexeddb
-            onedit() {},
-
             // Firebase API key
             apiKey: '',
 
@@ -78,12 +64,6 @@ export default (editor, opts = {}) => {
         },
         ...opts
     };
-
-    // Load i18n files
-    editor.I18n && editor.I18n.addMessages({
-        en,
-        ...options.i18n,
-    });
 
     // Load commands
     commands(editor, options);
