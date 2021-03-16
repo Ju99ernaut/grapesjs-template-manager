@@ -10,7 +10,8 @@
     "scripts": {
         "start": "grapesjs-cli serve",
         "build": "grapesjs-cli build",
-        "build:css": "node-sass src/styles.scss dist/grapesjs-template-manager.min.css --output-style compressed",
+        "build:css": "sass src/styles.scss dist/grapesjs-template-manager.min.css",
+        "watch:scss": "sass --watch src/styles.scss dist/grapesjs-template-manager.min.css",
         "bump": "npm version patch -m 'Bump v%s'"
     },
     "keywords": [
@@ -18,8 +19,7 @@
         "plugin"
     ],
     "devDependencies": {
-        "grapesjs-cli": "^1.0.14",
-        "node-sass": "^4.14.1"
+        "grapesjs-cli": "^1.0.14"
     },
     "author": "Brendon Ngirazi",
     "license": "MIT",
