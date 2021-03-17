@@ -130,12 +130,10 @@ export class TemplateManager {
             const target = e.currentTarget;
             if (target.innerHTML.toLowerCase() === 'pages') {
                 $('.templates-tab').hide();
-                $('#templates-container').hide();
-                $('#pages-container').show();
+                $('.pages-tab').show();
             } else {
                 $('.templates-tab').show();
-                $('#templates-container').show();
-                $('#pages-container').hide();
+                $('.pages-tab').hide();
             }
         });
         return content;
@@ -166,14 +164,8 @@ export class TemplateManager {
                         </button>
                     </span>
                 </div>
-                <div class="${pfx}templates-header2 pages-tab">
-                    Your Pages
-                </div>
-                <div class="${pfx}templates-header2 templates-tab" style="display:none">
-                    Your Templates
-                </div>
-                <div id="pages-container"></div>
-                <div id="templates-container" style="display:none"></div>
+                <div id="pages-container" class="pages-tab"></div>
+                <div id="templates-container" class="templates-tab" style="display:none"></div>
             </div>
         </div>`);
         content.find('#page-name').on('keyup', e => this.page = e.currentTarget.value)

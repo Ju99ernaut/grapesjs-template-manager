@@ -26,14 +26,7 @@ $prefix: 'gjs-' !default;
     background-color: rgba(255, 255, 255, 0.05);
 }
 
-.#{$prefix}templates-header2 {
-    font-size: 1rem;
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: lighter;
-    margin-top: 10px;
-}
-
-.#{$prefix}templates-header1 {
+.#{$prefix}templates-header {
     font-size: 2rem;
     font-family: Arial, Helvetica, sans-serif;
     font-weight: lighter;
@@ -218,6 +211,11 @@ $prefix: 'gjs-' !default;
     }
 }
 
+.pages-tab,
+.templates-tab {
+    animation: fadein 1s;
+}
+
 .lds-ellipsis {
     display: inline-block;
     width: 80px;
@@ -281,5 +279,15 @@ $prefix: 'gjs-' !default;
 
     100% {
         transform: translate(24px, 0);
+    }
+}
+
+@keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
     }
 }
