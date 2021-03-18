@@ -36,6 +36,10 @@ $prefix: 'gjs-' !default;
 .#{$prefix}templates-cont {
     margin: 2% 9% 0 9%;
 
+    .#{$prefix}fonts {
+        margin-bottom: 5px;
+    }
+
     .#{$prefix}field {
         width: 75%;
         display: inline-block;
@@ -190,10 +194,12 @@ $prefix: 'gjs-' !default;
 .#{$prefix}tab {
     overflow: hidden;
     border: 1px solid rgba(0, 0, 0, 0.1);
-    background-color: transparent;
+    background-color: rgba(0, 0, 0, 0.05);
+    margin-bottom: 5px;
 
     button {
         background-color: inherit;
+        color: inherit;
         float: left;
         border: none;
         outline: none;
