@@ -1,4 +1,4 @@
-export class TemplateManager {
+export default class TemplateManager {
     constructor(editor, opts = {}) {
         this.editor = editor;
         this.$ = editor.$;
@@ -8,27 +8,27 @@ export class TemplateManager {
     }
 
     _createPage() {
-        const { editor, templateIdx } = this;
-        const sm = editor.Storage;
-        sm.get(sm.getCurrent()).set({ idx: templateIdx, template: false });
+        const { editor, templateIdx, page } = this;
+        const cs = editor.Storage.getCurrentStorage();
+        cs.setIdx(templateIdx);
+        cs.setIsTemplate(false);
         this.page && editor.load(res => {
             editor.setComponents(res.components ? JSON.parse(res.components) : res.html);
             editor.setStyle(res.styles ? JSON.parse(res.styles) : res.css);
-            sm.get(sm.getCurrent()).set({
-                id: this.page,
-                idx: editor.runCommand('uuidv4'),
-                thumbnail: res.thumbnail || ''
-            });
+            cs.setId(page);
+            cs.setIdx(editor.runCommand('uuidv4'));
+            cs.setThumbnail(res.thumbnail || '');
             editor.Modal.close();
         });
     };
 
     _openTemplate() {
         const { editor, templateIdx } = this;
-        const sm = editor.Storage;
-        sm.get(sm.getCurrent()).set({ idx: templateIdx, template: true });
+        const cs = editor.Storage.getCurrentStorage();
+        cs.setIdx(templateIdx);
+        cs.setIsTemplate(true);
         editor.load(res => {
-            sm.get(sm.getCurrent()).set({ thumbnail: res.thumbnail || '' });
+            cs.setThumbnail(res.thumbnail || '');
             editor.setComponents(res.components ? JSON.parse(res.components) : res.html);
             editor.setStyle(res.styles ? JSON.parse(res.styles) : res.css);
             editor.Modal.close();
@@ -46,11 +46,12 @@ export class TemplateManager {
 
     _openPage(e) {
         const { editor } = this;
-        const sm = editor.Storage;
-        const idx = e.currentTarget.dataset.idx;
-        sm.get(sm.getCurrent()).set({ idx, template: false });
+        const cs = editor.Storage.getCurrentStorage();
+        cs.setIdx(e.currentTarget.dataset.idx);
+        cs.setIsTemplate(false);
         editor.load(res => {
-            sm.get(sm.getCurrent()).set({ id: res.id, thumbnail: res.thumbnail || '' });
+            cs.setId(res.id);
+            cs.setThumbnail(res.thumbnail || '');
             editor.setComponents(res.components ? JSON.parse(res.components) : res.html);
             editor.setStyle(res.styles ? JSON.parse(res.styles) : res.css);
             editor.Modal.close();
@@ -75,8 +76,7 @@ export class TemplateManager {
 
     _deletePage(e) {
         const { editor, opts } = this;
-        const sm = editor.Storage;
-        sm.get(sm.getCurrent())
+        editor.Storage.getCurrentStorage()
             .delete(opts.onDelete, opts.onDeleteError, e.currentTarget.dataset.idx);
         e.currentTarget.parentElement
             .parentElement.style.display = 'none';
@@ -98,10 +98,11 @@ export class TemplateManager {
     }
 
     _pages(thumbs) {
-        const sm = this.editor.Storage;
-        const content = this._thumbsCont(thumb);
+        const { pfx } = this;
+        const cs = this.editor.Storage.getCurrentStorage();
+        const content = this._thumbsCont(thumbs);
         content.find(`.${pfx}templates-card`)
-            .filter((i, elm) => elm.getAttribute('data-idx') == sm.get(sm.getCurrent()).get('idx'))
+            .filter((i, elm) => elm.getAttribute('data-idx') == cs.currentIdx)
             .addClass(`${pfx}templates-card-active`)
             .find('i.fa')
             .hide();
@@ -110,7 +111,8 @@ export class TemplateManager {
     }
 
     _templates(thumbs) {
-        const content = this._thumbsCont(thumb);
+        const { pfx } = this;
+        const content = this._thumbsCont(thumbs);
         content.find(`.${pfx}templates-card`)
             .filter((i, elm) => elm.getAttribute('data-idx') == this.templateIdx)
             .addClass(`${pfx}templates-card-active`)
@@ -128,6 +130,8 @@ export class TemplateManager {
             </div>`);
         content.find('button').on('click', e => {
             const target = e.currentTarget;
+            content.find(`.${pfx}tablinks`).removeClass('active');
+            $(target).addClass('active');
             if (target.innerHTML.toLowerCase() === 'pages') {
                 $('.templates-tab').hide();
                 $('.pages-tab').show();
