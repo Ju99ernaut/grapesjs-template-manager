@@ -12,6 +12,22 @@ export default (editor, opts = {}) => {
         currentThumbnail: '',
         isTemplate: false,
 
+        setId(id) {
+            this.currentId = id;
+        },
+
+        setIdx(idx) {
+            this.currentIdx = idx;
+        },
+
+        setThumbnail(thumbnail) {
+            this.currentThumbnail = thumbnail;
+        },
+
+        setIsTemplate(isTemplate) {
+            this.isTemplate = !!isTemplate;
+        },
+
         load(keys, clb, clbErr) {
             const urlLoad = remote.get('urlLoad');
             remote.set({ urlLoad: urlLoad + this.currentIdx });

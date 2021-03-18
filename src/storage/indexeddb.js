@@ -14,7 +14,7 @@ export default (editor, opts = {}) => {
         } else {
             const indexedDB = window.indexedDB || window.mozIndexedDB ||
                 window.webkitIndexedDB || window.msIndexedDB;
-            const request = indexedDB.open(options.dbName, options.indexeddbVersion);
+            const request = indexedDB.open(opts.dbName, opts.indexeddbVersion);
             const onError = () => sm.onError(storageName, request.errorCode);
             request.onerror = onError;
             request.onsuccess = () => {
@@ -51,9 +51,25 @@ export default (editor, opts = {}) => {
 
         getObjectStore,
 
+        setId(id) {
+            this.currentId = id;
+        },
+
+        setIdx(idx) {
+            this.currentIdx = idx;
+        },
+
+        setThumbnail(thumbnail) {
+            this.currentThumbnail = thumbnail;
+        },
+
+        setIsTemplate(isTemplate) {
+            this.isTemplate = !!isTemplate;
+        },
+
         load(keys, clb, clbErr) {
             getAsyncObjectStore(objs => {
-                const request = objs.get(idx);
+                const request = objs.get(this.currentIdx);
                 request.onerror = clbErr;
                 request.onsuccess = () => {
                     clb(request.result);
@@ -87,7 +103,7 @@ export default (editor, opts = {}) => {
 
         delete(clb, clbErr, index) {
             getAsyncObjectStore(objs => {
-                const request = objs.delete(index || idx);
+                const request = objs.delete(index || this.currentIdx);
                 request.onerror = clbErr;
                 request.onsuccess = clb;
             });

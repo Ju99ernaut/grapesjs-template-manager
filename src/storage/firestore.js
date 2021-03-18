@@ -7,10 +7,10 @@ export default (editor, opts = {}) => {
     let db;
     let doc;
     let collection;
-    const apiKey = options.apiKey;
-    const authDomain = options.authDomain;
-    const projectId = options.projectId;
-    const dbSettings = options.settings;
+    const apiKey = opts.apiKey;
+    const authDomain = opts.authDomain;
+    const projectId = opts.projectId;
+    const dbSettings = opts.settings;
     const onError = err => sm.onError(storageName, err.code || err);
 
     const getDoc = () => doc;
@@ -23,11 +23,11 @@ export default (editor, opts = {}) => {
 
         const callback = () => {
             db = firebase.firestore();
-            collection = db.collection(options.objectStoreName);
+            collection = db.collection(opts.objectStoreName);
             clb(collection);
         }
 
-        if (options.enableOffline) {
+        if (opts.enableOffline) {
             fs.enablePersistence().then(callback).catch(onError);
         } else {
             callback();
@@ -50,6 +50,22 @@ export default (editor, opts = {}) => {
 
         setDocId(id) {
             this.currentIdx = id;
+        },
+
+        setId(id) {
+            this.currentId = id;
+        },
+
+        setIdx(idx) {
+            this.currentIdx = idx;
+        },
+
+        setThumbnail(thumbnail) {
+            this.currentThumbnail = thumbnail;
+        },
+
+        setIsTemplate(isTemplate) {
+            this.isTemplate = !!isTemplate;
         },
 
         load(keys, clb, clbError) {
