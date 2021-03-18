@@ -36,7 +36,7 @@ const pn = editor.Panels;
 const panelOpts = pn.addPanel({
   id: 'options'
 });
-panelOpts.get('buttons').add([{{
+panelOpts.get('buttons').add([{
   attributes: {
     title: 'Open Templates'
   },
@@ -64,7 +64,7 @@ panelOpts.get('buttons').add([{{
   className: 'fa fa-camera',
   command: 'take-screenshot',//Take an image of the canvas
   id: 'take-screenshot'
-}}]);
+}]);
 ```
 
 ### CSS

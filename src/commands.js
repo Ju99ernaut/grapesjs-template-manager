@@ -36,7 +36,7 @@ export default (editor, opts = {}) => {
     });
 
     cm.add('delete-template', editor => {
-        sm.get(sm.getCurrent())
+        sm.getCurrentStorage()
             .delete(opts.onDelete, opts.onDeleteError);
     });
 }
