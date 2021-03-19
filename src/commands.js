@@ -18,6 +18,7 @@ export default (editor, opts = {}) => {
 
     cm.add('get-uuidv4', () => uuidv4());
 
+    // TODO add default callbacks that sets thumbnail
     cm.add('take-screenshot', (editor, options) => {
         const el = editor.getWrapper().getEl();
         getJpeg(el, {
