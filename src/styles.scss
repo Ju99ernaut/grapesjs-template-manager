@@ -56,6 +56,12 @@ $prefix: 'gjs-' !default;
     display: block;
 }
 
+#templates-tab {
+    position: absolute;
+    top: 25px;
+    right: 90px;
+}
+
 .#{$prefix}btn-wide {
     padding: 10px;
     border-radius: 3px;
@@ -191,17 +197,25 @@ $prefix: 'gjs-' !default;
     margin-top: 45px;
 }
 
+.#{$prefix}tip-about {
+    padding: 10px;
+    font-size: .9rem;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-left: 3px solid #8888da;
+    background-color: rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
 .#{$prefix}tab {
     overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    background-color: rgba(0, 0, 0, 0.05);
-    margin-bottom: 5px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
 
     button {
         background-color: inherit;
         color: inherit;
         float: left;
-        border: none;
+        border: 1px solid rgba(0, 0, 0, 0.1);
         outline: none;
         cursor: pointer;
         padding: 14px 16px;
