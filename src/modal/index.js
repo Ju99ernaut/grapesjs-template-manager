@@ -22,8 +22,8 @@ export default (editor, opts = {}) => {
                     mdl.setContent(content);
                     const pages = content.find('#pages-container');
                     const templates = content.find('#templates-container');
-                    pages.find(`.${this.pfx}templates-card`).remove();
-                    templates.find(`.${this.pfx}templates-card`).remove();
+                    pages.find(`.${pfx}templates-card-2`).remove();
+                    templates.find(`.${pfx}templates-card-2`).remove();
                     pages.append(templateManager.update(res.filter(r => !r.template)));
                     templates.append(templateManager.update(res.filter(r => r.template)), false);
                 },
@@ -32,9 +32,6 @@ export default (editor, opts = {}) => {
             mdl.getModel().once('change:open', () => {
                 mdlDialog.classList.remove(mdlClass);
             });
-        },
-        stop(editor) {
-            mdl.close();
         }
     });
 };

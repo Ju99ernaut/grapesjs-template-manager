@@ -123,10 +123,10 @@ export default class TemplateManager {
     }
 
     _tabs() {
-        const { pfx, $ } = this;
+        const { pfx, $, opts } = this;
         const content = $(`<div class="${pfx}tab">
-                <button class="${pfx}tablinks active">Pages</button>
-                <button class="${pfx}tablinks">Templates</button>
+                <button class="${pfx}tablinks active">${opts.tabsText.pages}</button>
+                <button class="${pfx}tablinks">${opts.tabsText.templates}</button>
             </div>`);
         content.find('button').on('click', e => {
             const target = e.currentTarget;
@@ -148,34 +148,47 @@ export default class TemplateManager {
     }
 
     render() {
-        const { pfx, $ } = this;
+        const { pfx, $, opts } = this;
+        const tabs = this._tabs();
         const content = $(`<div id="pages" class="${pfx}templates ${pfx}one-bg ${pfx}two-color">
             <div class="${pfx}templates-overlay"></div>
             <div class="${pfx}templates-cont">
                 <div class="${pfx}fonts templates-tab" style="display:none">
-                    <label class="${pfx}field-label" for="page-name">Name</label>
+                    <div class="${pfx}tip-about ${pfx}four-color">${opts.help}</div>
+                    <label class="${pfx}field-label" for="page-name">${opts.nameLabel}</label>
                     <div class="${pfx}field">
                         <input type="text" name="pageName" id="page-name">
                     </div>
                     <span>
                         <button class="${pfx}btn-prim ${pfx}btn-wide" id="template-edit">
-                            Edit Selected
+                            ${opts.btnText.edit}
                         </button>
                     </span>
                     <span>
                         <button class="${pfx}btn-prim ${pfx}btn-wide" id="page-create">
-                            Create
+                            ${opts.btnText.create}
                         </button>
                     </span>
                 </div>
-                <div id="pages-container" class="pages-tab"></div>
+                <div id="pages-container" class="pages-tab">
+                    <button class="${pfx}btn-prim ${pfx}btn-wide" id="templates-tab">
+                        ${opts.btnText.new}
+                    </button>
+                </div>
                 <div id="templates-container" class="templates-tab" style="display:none"></div>
             </div>
         </div>`);
-        content.find('#page-name').on('keyup', e => this.page = e.currentTarget.value)
+        content.find('#templates-tab').on('click', () => {
+            const tablinks = tabs.find(`.${pfx}tablinks`);
+            tablinks.removeClass('active');
+            $(tablinks.get(1)).addClass('active');
+            $('.templates-tab').show();
+            $('.pages-tab').hide();
+        });
+        content.find('#page-name').on('keyup', e => this.page = e.currentTarget.value);
         content.find('#page-create').on('click', () => this._createPage());
         content.find('#template-edit').on('click', () => this._openTemplate());
-        content.find(`.${pfx}templates-cont`).prepend(this._tabs());
+        content.find(`.${pfx}templates-cont`).prepend(tabs);
         return content;
     }
 
