@@ -18,14 +18,6 @@ export default (editor, opts = {}) => {
             // Indexeddb version schema
             indexeddbVersion: 4,
 
-            // blank Template
-            blankTemplate: {
-                id: 'Blank',
-                template: true,
-                'gjs-html': '',
-                'gjs-css': '',
-            },
-
             // When template or page is deleted
             onDelete(res) {
                 console.log('Deleted:', res)
@@ -46,6 +38,25 @@ export default (editor, opts = {}) => {
 
             // Content for templates modal title
             mdlTitle: 'Template Manager',
+
+            // Content for button text
+            btnText: {
+                new: 'New Page',
+                edit: 'Edit Selected',
+                create: 'Create'
+            },
+
+            // Content for tabs
+            tabsText: {
+                pages: 'Pages',
+                templates: 'Templates'
+            },
+
+            // Content for label
+            nameLabel: 'Name',
+
+            // Content for help message
+            help: 'Select a template, enter page name the create. Use edit to modify the template.',
 
             // Firebase API key
             apiKey: '',
@@ -74,7 +85,16 @@ export default (editor, opts = {}) => {
     // Load page manager
     modal(editor, options);
 
+    // Load page with index zero
     editor.on('load', () => {
-        //TODO lood first page
+        const cs = editor.Storage.getCurrentStorage();
+        cs.loadAll(res => {
+            const firstPage = res[0];
+            cs.setId(firstPage.id);
+            cs.setIdx(firstPage.idx);
+            cs.setThumbnail(firstPage.thumbnail);
+            cs.setIsTemplate(firstPage.isTemplate);
+            editor.load();
+        });
     });
 };
