@@ -25,8 +25,7 @@ export default (editor, opts = {}) => {
                     pages.find(`.${pfx}templates-card-2`).remove();
                     templates.find(`.${pfx}templates-card-2`).remove();
                     pages.append(templateManager.update(res.filter(r => !r.template)));
-                    // TODO fix error logged
-                    templates.append(templateManager.update(res.filter(r => r.template)), false);
+                    templates.append(templateManager.update(res.filter(r => r.template), false));
                 },
                 err => console.log("Error", err));
             mdl.open();
