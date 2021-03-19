@@ -18,30 +18,27 @@ export default (editor, opts = {}) => {
 
     cm.add('get-uuidv4', () => uuidv4());
 
-    cm.add('take-screenshot', (editor, options = {
-        clb(dataUrl) {
-            editor.Storage.getCurrentStorage().setThumbnail(dataUrl)
-        },
-        clbErr: opts.onScreenshotError
-    }) => {
+    cm.add('take-screenshot', editor => {
         const el = editor.getWrapper().getEl();
+        const clb = dataUrl => editor.Storage.getCurrentStorage().setThumbnail(dataUrl);
         getJpeg(el, {
-            quality: options.quality,
+            quality: opts.quality,
             height: 1000,
             'cacheBust': true,
             style: {
                 'background-color': 'white',
                 ...editor.getWrapper().getStyle()
             },
-        }, options.clb, options.clbErr);
+        }, clb, opts.onScreenshotError);
     });
 
     cm.add('save-as-template', editor => {
+        cs.setIsTemplate(true);
         editor.store();
     });
 
     cm.add('delete-template', editor => {
-        sm.getCurrentStorage()
+        editor.Storage.getCurrentStorage()
             .delete(opts.onDelete, opts.onDeleteError);
     });
 }
