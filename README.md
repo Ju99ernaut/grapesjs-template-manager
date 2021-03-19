@@ -98,6 +98,7 @@ body, html {
 | `indexeddbVersion` | IndexedDB schema version | `4` |
 | `onDelete` | On successful template deletion | `Function` |
 | `onDeleteError` | On error template deletion | `Function` |
+| `onScreenShotError` | On error capturing screenshot | `Function` |
 | `quality` | Generated screenshot quality | `.01` |
 | `mdlTitle` | Template modal title | `Template Manager` |
 | `apiKey` | `Firebase` API key | `` |
