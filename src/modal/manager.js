@@ -66,7 +66,10 @@ export default class TemplateManager {
         if (inputCont.get(0).style.display === 'block') {
             lbl.text(input.val());
             inputCont.hide();
-            //TODO reset name and store; 
+            this.editor.store({
+                idx: e.currentTarget.dataset.idx,
+                id: input.val().trim()
+            });
         } else {
             input.val(lbl.text().trim());
             lbl.text('...');
