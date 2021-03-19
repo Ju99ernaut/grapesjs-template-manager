@@ -1,6 +1,6 @@
 # Grapesjs Template Manager
 
->Requires GrapesJS v0.14.15 or higher
+>(WIP)Pending some error fixes and feature implementations .Requires GrapesJS v0.14.15 or higher
 
 Template and page manager for grapesjs
 
