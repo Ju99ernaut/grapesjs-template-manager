@@ -16,7 +16,7 @@ export default class TemplateManager {
             editor.setComponents(res.components ? JSON.parse(res.components) : res.html);
             editor.setStyle(res.styles ? JSON.parse(res.styles) : res.css);
             cs.setId(page);
-            cs.setIdx(editor.runCommand('uuidv4'));
+            cs.setIdx(editor.runCommand('get-uuidv4'));
             cs.setThumbnail(res.thumbnail || '');
             editor.Modal.close();
         });
@@ -36,7 +36,8 @@ export default class TemplateManager {
     };
 
     _selectTemplate(e) {
-        const target = e.currentTarget
+        const { pfx } = this;
+        const target = e.currentTarget;
         this.templateIdx = target.dataset.idx;
         this.$(`.${pfx}templates-card`).each((i, elm) => {
             elm.classList.remove(`${pfx}templates-card-active`)
@@ -66,7 +67,7 @@ export default class TemplateManager {
         if (inputCont.get(0).style.display === 'block') {
             lbl.text(input.val());
             inputCont.hide();
-            this.editor.store({
+            this.editor.Storage.getCurrentStorage().store({
                 idx: e.currentTarget.dataset.idx,
                 id: input.val().trim()
             });
