@@ -28,9 +28,9 @@ export default class TemplateManager {
         cs.setIdx(templateIdx);
         cs.setIsTemplate(true);
         editor.load(res => {
-            cs.setThumbnail(res.thumbnail || '');
             editor.setComponents(res.components ? JSON.parse(res.components) : res.html);
             editor.setStyle(res.styles ? JSON.parse(res.styles) : res.css);
+            cs.setThumbnail(res.thumbnail || '');
             editor.Modal.close();
         });
     };
@@ -51,10 +51,10 @@ export default class TemplateManager {
         cs.setIdx(e.currentTarget.dataset.idx);
         cs.setIsTemplate(false);
         editor.load(res => {
-            cs.setId(res.id);
-            cs.setThumbnail(res.thumbnail || '');
             editor.setComponents(res.components ? JSON.parse(res.components) : res.html);
             editor.setStyle(res.styles ? JSON.parse(res.styles) : res.css);
+            cs.setId(res.id);
+            cs.setThumbnail(res.thumbnail || '');
             editor.Modal.close();
         });
     }
@@ -67,10 +67,11 @@ export default class TemplateManager {
         if (inputCont.get(0).style.display === 'block') {
             lbl.text(input.val());
             inputCont.hide();
-            this.editor.Storage.getCurrentStorage().store({
-                idx: e.currentTarget.dataset.idx,
-                id: input.val().trim()
-            });
+            // TODO fix rename
+            //this.editor.Storage.getCurrentStorage().store({
+            //    idx: e.currentTarget.dataset.idx,
+            //    id: input.val().trim()
+            //});
         } else {
             input.val(lbl.text().trim());
             lbl.text('...');
