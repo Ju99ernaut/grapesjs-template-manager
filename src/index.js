@@ -43,7 +43,8 @@ export default (editor, opts = {}) => {
             btnText: {
                 new: 'New Page',
                 edit: 'Edit Selected',
-                create: 'Create'
+                create: 'Create',
+                createBlank: 'Create Blank Template'
             },
 
             // Content for tabs
@@ -57,6 +58,9 @@ export default (editor, opts = {}) => {
 
             // Content for help message
             help: 'Select a template, enter page name the create. Use edit to modify the template.',
+
+            // Show when no pages yet pages
+            nopages: '<div style="display:flex;align-items:center;padding:50px;margin:auto;">No Pages Yet</div>',
 
             // Firebase API key
             apiKey: '',

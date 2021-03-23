@@ -151,6 +151,43 @@ export default class TemplateManager {
         return '<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>';
     }
 
+    noPages() {
+        return `<div class="${this.pfx}templates-card-2">${this.opts.nopages}</div>`;
+    }
+
+    noTemplates() {
+        const { $, id, pfx, opts, editor } = this;
+        const cs = editor.Storage.getCurrentStorage();
+        const content = $(`<div class="${pfx}templates-card-2">
+                <div style="display:flex;align-items:center;padding:50px;margin:auto;">
+                    <button class="${pfx}btn-prim ${pfx}btn-wide" id="create-blank">
+                        ${opts.btnText.createBlank}
+                    </button>
+                </div>
+            </div>`);
+
+        content.find('#create-blank').on('click', () => {
+            const data = {};
+            data[`${id}html`] = '';
+            data[`${id}css`] = '';
+            cs.store({
+                idx: editor.runCommand('get-uuidv4'),
+                id: 'Blank',
+                template: true,
+                thumbnail: '',
+                ...data
+            });
+            cs.loadAll(res => {
+                    const templates = $('#pages').find('#templates-container');
+                    templates.find(`.${pfx}templates-card-2`).remove();
+                    templates.append(this.update(res.filter(r => r.template), false));
+                },
+                err => console.log("Error", err));
+        });
+
+        return content;
+    }
+
     render() {
         const { pfx, $, opts } = this;
         const tabs = this._tabs();
@@ -199,6 +236,8 @@ export default class TemplateManager {
     update(data, pages = true) {
         let thumbnailsEl = '';
         const { pfx, id } = this;
+
+        if (!data.length) return pages ? this.noPages() : this.noTemplates();
 
         data.forEach(el => {
             const dataSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="template-preview" viewBox="0 0 1300 1100" width="99%" height="220">
