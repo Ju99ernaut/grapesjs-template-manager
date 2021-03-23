@@ -101,6 +101,15 @@ export default (editor, opts = {}) => {
             });
         },
 
+        update(data, clb, clbError) {
+            const { idx, ..._data } = data;
+            getAsyncCollection(cll => {
+                cll.doc(idx).set(_data, { merge: true })
+                    .then(clb)
+                    .catch(clbError);
+            });
+        },
+
         delete(clb, clbError, index) {
             if (!index) {
                 getAsyncDoc(doc => {
@@ -113,7 +122,7 @@ export default (editor, opts = {}) => {
                     cll.doc(index).delete()
                         .then(clb)
                         .catch(clbError);
-                })
+                });
             }
         }
     });

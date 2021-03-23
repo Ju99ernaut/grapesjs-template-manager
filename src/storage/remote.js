@@ -52,11 +52,16 @@ export default (editor, opts = {}) => {
             remote.set({ urlStore });
         },
 
+        update(data, clb, clbErr) {
+            const { idx, ...body } = data;
+            const urlUpdate = remote.get('urlStore') + idx;
+            remote.fetch(urlUpdate, { body }, clb, clbErr);
+        },
+
         delete(clb, clbErr, index) {
             const urlDelete = remote.get('urlDelete') + (index || this.currentIdx);
             const method = 'delete';
             remote.request(urlDelete, { method }, clb, clbErr);
         }
-
     });
 }

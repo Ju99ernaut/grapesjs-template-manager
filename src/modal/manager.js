@@ -3,7 +3,7 @@ export default class TemplateManager {
         this.editor = editor;
         this.$ = editor.$;
         this.pfx = editor.getConfig('stylePrefix');
-        this.id = editor.Storage.getConfig('id') || 'gjs-';
+        this.id = editor.Storage.getConfig().id || 'gjs-';
         this.opts = opts;
     }
 
@@ -67,11 +67,10 @@ export default class TemplateManager {
         if (inputCont.get(0).style.display === 'block') {
             lbl.text(input.val());
             inputCont.hide();
-            // TODO fix rename
-            //this.editor.Storage.getCurrentStorage().store({
-            //    idx: e.currentTarget.dataset.idx,
-            //    id: input.val().trim()
-            //});
+            this.editor.Storage.getCurrentStorage().update({
+                idx: e.currentTarget.dataset.idx,
+                id: input.val().trim()
+            });
         } else {
             input.val(lbl.text().trim());
             lbl.text('...');

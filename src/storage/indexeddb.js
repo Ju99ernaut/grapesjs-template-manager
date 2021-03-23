@@ -72,7 +72,7 @@ export default (editor, opts = {}) => {
                 const request = objs.get(this.currentIdx);
                 request.onerror = clbErr;
                 request.onsuccess = () => {
-                    clb(request.result);
+                    clb && clb(request.result);
                 };
             });
         },
@@ -82,7 +82,7 @@ export default (editor, opts = {}) => {
                 const request = objs.getAll();
                 request.onerror = clbErr;
                 request.onsuccess = () => {
-                    clb(request.result);
+                    clb && clb(request.result);
                 };
             });
         },
@@ -101,6 +101,18 @@ export default (editor, opts = {}) => {
             });
         },
 
+        update(data, clb, clbErr) {
+            const { idx, ..._data } = data;
+            getAsyncObjectStore(objs => {
+                const request = objs.get(idx);
+                request.onerror = clbErr;
+                request.onsuccess = () => {
+                    objs.put({ idx, ...request.result, ..._data });
+                    clb && clb(request.result);
+                };
+            });
+        },
+
         delete(clb, clbErr, index) {
             getAsyncObjectStore(objs => {
                 const request = objs.delete(index || this.currentIdx);
@@ -108,6 +120,5 @@ export default (editor, opts = {}) => {
                 request.onsuccess = clb;
             });
         }
-
     });
 }
