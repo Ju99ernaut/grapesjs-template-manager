@@ -123,9 +123,10 @@ window.editor = grapesjs.init({
   // ...
   storageManager:  {
     type: 'rest-api',
-    urlStore: 'https://endpoint/store/',
-    urlLoad: 'https://endpoint/load/',
-    urlDelete: 'https://endpoint/delete/',// usually the above URIs are the same
+    // the URIs below can be the same depending on your API design 
+    urlStore: 'https://endpoint/store/',// POST
+    urlLoad: 'https://endpoint/load/',// GET
+    urlDelete: 'https://endpoint/delete/',// DELETE
     params: { _some_token: '...' },
     headers: { Authorization: 'Basic ...' }
   },
