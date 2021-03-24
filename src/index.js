@@ -94,11 +94,15 @@ export default (editor, opts = {}) => {
         const cs = editor.Storage.getCurrentStorage();
         cs.loadAll(res => {
             const firstPage = res[0];
-            cs.setId(firstPage.id);
-            cs.setIdx(firstPage.idx);
-            cs.setThumbnail(firstPage.thumbnail);
-            cs.setIsTemplate(firstPage.isTemplate);
-            editor.load();
+            if (firstPage) {
+                cs.setId(firstPage.id);
+                cs.setIdx(firstPage.idx);
+                cs.setThumbnail(firstPage.thumbnail);
+                cs.setIsTemplate(firstPage.isTemplate);
+                editor.load();
+            } else {
+                cs.setIdx(editor.runCommand('get-uuidv4'));
+            }
         });
     });
 };
