@@ -36,7 +36,7 @@ export default (editor, opts = {}) => {
         },
 
         loadAll(clb, clbErr) {
-            remote.load(keys, clb, clbErr);
+            remote.load({}, clb, clbErr);
         },
 
         store(data, clb, clbErr) {
