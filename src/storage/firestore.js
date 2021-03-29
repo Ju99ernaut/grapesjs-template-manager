@@ -17,26 +17,33 @@ export default (editor, opts = {}) => {
 
     const getAsyncCollection = (clb) => {
         if (collection) return clb(collection);
-        firebase.initializeApp({ apiKey, authDomain, projectId });
-        const fs = firebase.firestore();
-        fs.settings(dbSettings);
+        if (!firebase.apps.length) {
+            firebase.initializeApp({ apiKey, authDomain, projectId });
+            db = firebase.firestore();
+            db.settings(dbSettings);
+        }
+        else {
+            firebase.app();
+        }
 
         const callback = () => {
-            db = firebase.firestore();
             collection = db.collection(opts.objectStoreName);
             clb(collection);
         }
 
-        if (opts.enableOffline) {
-            fs.enablePersistence().then(callback).catch(onError);
-        } else {
-            callback();
-        }
+        callback();
+
+        //if (opts.enableOffline) {
+        //    db.enablePersistence().then(callback).catch(onError);
+        //} else {
+        //    callback();
+        //}
     };
 
     const getAsyncDoc = (clb) => {
         getAsyncCollection(cll => {
-            doc = cll.doc(this.currentIdx);
+            const cs = editor.Storage.getCurrentStorage();
+            doc = cll.doc(cs.currentIdx);
             clb(doc);
         });
     };
@@ -80,22 +87,23 @@ export default (editor, opts = {}) => {
             getAsyncCollection(cll => {
                 cll.get()
                     .then(docs => {
-                        docs.map(doc => doc.data());
-                        clb(docs);
+                        const data = [];
+                        docs.forEach(doc => data.push(doc.data()));
+                        clb(data);
                     })
                     .catch(clbError);
             });
         },
 
         store(data, clb, clbError) {
-            getAsyncDoc(doc => {
-                doc.set({
-                        idx: this.currentIdx,
-                        id: this.currentId,
-                        template: this.isTemplate,
-                        thumbnail: this.currentThumbnail,
-                        ...data
-                    })
+            getAsyncCollection(cll => {
+                cll.doc(data.idx || this.currentIdx).set({
+                    idx: this.currentIdx,
+                    id: this.currentId,
+                    template: this.isTemplate,
+                    thumbnail: this.currentThumbnail,
+                    ...data
+                })
                     .then(clb)
                     .catch(clbError);
             });
