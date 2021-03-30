@@ -98,6 +98,7 @@ body, html {
 |-|-|-
 | `dbName` | Database name | `gjs` |
 | `objectStoreName` | Collection name | `templates` |
+| `loadFirst` | Load first template in storage | `true` |
 | `uuidKey` | Generate uuid from editor | `true` |
 | `indexeddbVersion` | IndexedDB schema version | `4` |
 | `onDelete` | On successful template deletion | `Function` |
@@ -111,11 +112,62 @@ body, html {
 | `enableOffline` | Enable `Firestore` support for offline data persistence | `true` |
 | `settings` | `Firestore` database settings | `{ timestampsInSnapshots: true }` |
 
+* Setting `loadFirst` to `false` prevents overwritting the contents of the editor with the contents of the first template in storage.
 * Only use options for `Firebase` when using `Cloud Firestore` storage.
 * `dbName` and `indexeddbVersion` only apply to `indexddb` storage.
-* `objectStoreName` acts as collection name for both `firestore` and ` indexeddb`..
+* `objectStoreName` acts as collection name for both `firestore` and ` indexeddb`.
 
-For remote storage it is also important to configure it to work with the template manager: 
+## Local/IndexedDB
+
+```js
+window.editor = grapesjs.init({
+  container: '#gjs',
+  // ...
+  storageManager:  {
+    type: 'indexeddb'
+  },
+  plugins: ['grapesjs-template-manager'],
+  pluginsOpts: {
+    'grapesjs-template-manager': { /* Options */ }
+});
+```
+
+## Firestore
+
+Add libraries to `head` of document:
+
+```html
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+<!-- TODO: Add SDKs for Firebase products that you want to use
+https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js"></script>
+```
+
+Add credentials:
+
+```js
+window.editor = grapesjs.init({
+  container: '#gjs',
+  // ...
+  storageManager:  {
+    type: 'firestore'
+  },
+  plugins: ['grapesjs-template-manager'],
+  pluginsOpts: {
+    'grapesjs-template-manager': { 
+      // Firebase API key
+      apiKey: 'FIREBASE_API_KEY',
+      // Firebase Auth domain
+      authDomain: 'app-id-00a00.firebaseapp.com',
+      // Cloud Firestore project ID
+      projectId: 'app-id-00a00',
+    }
+  }
+});
+```
+
+## Remote/REST-API
 
 ```js
 window.editor = grapesjs.init({
