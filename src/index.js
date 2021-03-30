@@ -12,6 +12,9 @@ export default (editor, opts = {}) => {
             // Collection name
             objectStoreName: 'templates',
 
+            // Load first template in storage
+            loadFirst: true,
+
             // Use built-in uuid
             uuidKey: true,
 
@@ -94,7 +97,7 @@ export default (editor, opts = {}) => {
         const cs = editor.Storage.getCurrentStorage();
         cs.loadAll(res => {
             const firstPage = res[0];
-            if (firstPage) {
+            if (firstPage && options.loadFirst) {
                 cs.setId(firstPage.id);
                 cs.setIdx(firstPage.idx);
                 cs.setThumbnail(firstPage.thumbnail);
