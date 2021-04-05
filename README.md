@@ -134,6 +134,7 @@ window.editor = grapesjs.init({
 
 ## Firestore
 
+Setup firestore access rules.
 Add libraries to `head` of document:
 
 ```html
