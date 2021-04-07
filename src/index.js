@@ -15,8 +15,8 @@ export default (editor, opts = {}) => {
             // Load first template in storage
             loadFirst: true,
 
-            // Use built-in uuid
-            uuidKey: true,
+            // Add uuid as path parameter to store path for rest-api
+            uuidInPath: true,
 
             // Indexeddb version schema
             indexeddbVersion: 4,
@@ -60,7 +60,7 @@ export default (editor, opts = {}) => {
             nameLabel: 'Name',
 
             // Content for help message
-            help: 'Select a template, enter page name the create. Use edit to modify the template.',
+            help: 'Select a template, enter page name, then click create. Use edit to modify the template.',
 
             // Show when no pages yet pages
             nopages: '<div style="display:flex;align-items:center;padding:50px;margin:auto;">No Pages Yet</div>',
@@ -101,7 +101,7 @@ export default (editor, opts = {}) => {
                 cs.setId(firstPage.id);
                 cs.setIdx(firstPage.idx);
                 cs.setThumbnail(firstPage.thumbnail);
-                cs.setIsTemplate(firstPage.isTemplate);
+                cs.setIsTemplate(firstPage.template);
                 editor.load();
             } else {
                 cs.setIdx(editor.runCommand('get-uuidv4'));

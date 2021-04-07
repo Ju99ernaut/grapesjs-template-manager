@@ -30,7 +30,8 @@ export default (editor, opts = {}) => {
 
         load(keys, clb, clbErr) {
             const urlLoad = remote.get('urlLoad');
-            remote.set({ urlLoad: urlLoad + this.currentIdx });
+            const idx = urlLoad.endsWith("/") ? this.currentIdx : `/${this.currentIdx}`;
+            remote.set({ urlLoad: urlLoad + idx });
             remote.load(keys, clb, clbErr);
             remote.set({ urlLoad });
         },
@@ -41,7 +42,8 @@ export default (editor, opts = {}) => {
 
         store(data, clb, clbErr) {
             const urlStore = remote.get('urlStore');
-            remote.set({ urlStore: urlStore + this.currentIdx });
+            const idx = urlStore.endsWith("/") ? this.currentIdx : `/${this.currentIdx}`;
+            opts.uuidInPath && remote.set({ urlStore: urlStore + idx });
             remote.store({
                 idx: this.currentIdx,
                 id: this.currentId,
@@ -53,15 +55,26 @@ export default (editor, opts = {}) => {
         },
 
         update(data, clb, clbErr) {
-            const { idx, ...body } = data;
-            const urlUpdate = remote.get('urlStore') + idx;
-            remote.fetch(urlUpdate, { body }, clb, clbErr);
+            const urlLoad = remote.get('urlLoad');
+            let { idx } = data;
+            idx = urlLoad.endsWith("/") ? idx : `/${idx}`;
+            remote.set({ urlLoad: urlLoad + idx });
+            remote.load({}, res => {
+                const body = { ...res, ...data };
+                const method = 'post';
+                const urlUpdate = remote.get('urlStore');
+                idx = urlUpdate.endsWith("/") ? idx : `/${idx}`;
+                remote.request(urlUpdate + idx, { method, body }, clb, clbErr);
+            }, clbErr);
+            remote.set({ urlLoad });
         },
 
         delete(clb, clbErr, index) {
-            const urlDelete = remote.get('urlDelete') + (index || this.currentIdx);
+            const urlDelete = remote.get('urlDelete');
+            let idx = index || this.currentIdx;
+            idx = urlDelete.endsWith("/") ? idx : `/${idx}`;
             const method = 'delete';
-            remote.request(urlDelete, { method }, clb, clbErr);
+            remote.request(urlDelete + idx, { method }, clb, clbErr);
         }
     });
 }
