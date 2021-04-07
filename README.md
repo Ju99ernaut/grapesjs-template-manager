@@ -99,7 +99,6 @@ body, html {
 | `dbName` | Database name | `gjs` |
 | `objectStoreName` | Collection name | `templates` |
 | `loadFirst` | Load first template in storage | `true` |
-| `uuidKey` | Generate uuid from editor | `true` |
 | `indexeddbVersion` | IndexedDB schema version | `4` |
 | `onDelete` | On successful template deletion | `Function` |
 | `onDeleteError` | On error template deletion | `Function` |
@@ -111,11 +110,13 @@ body, html {
 | `projectId` | `Cloud Firestore` project ID | `` |
 | `enableOffline` | Enable `Firestore` support for offline data persistence | `true` |
 | `settings` | `Firestore` database settings | `{ timestampsInSnapshots: true }` |
+| `uuidInPath` | Add uuid as path parameter on store for `rest-api`(useful for validation) | `true` |
 
 * Setting `loadFirst` to `false` prevents overwritting the contents of the editor with the contents of the first template in storage.
 * Only use options for `Firebase` when using `Cloud Firestore` storage.
 * `dbName` and `indexeddbVersion` only apply to `indexddb` storage.
 * `objectStoreName` acts as collection name for both `firestore` and ` indexeddb`.
+* When `uuidInPath` is set to `false` the store request will be `http://endpoint/store/` instead of `http://endpoint/store/{uuid}`
 
 ## Local/IndexedDB
 
@@ -129,6 +130,7 @@ window.editor = grapesjs.init({
   plugins: ['grapesjs-template-manager'],
   pluginsOpts: {
     'grapesjs-template-manager': { /* Options */ }
+  }
 });
 ```
 
