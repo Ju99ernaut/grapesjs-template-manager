@@ -136,7 +136,7 @@ window.editor = grapesjs.init({
 
 ## Firestore
 
-Setup firestore access rules.
+Configure firestore access rules for your app.
 Add libraries to `head` of document:
 
 ```html
@@ -171,6 +171,8 @@ window.editor = grapesjs.init({
 ```
 
 ## Remote/REST-API
+
+Example backend https://github.com/Ju99ernaut/gjs-api
 
 ```js
 window.editor = grapesjs.init({
