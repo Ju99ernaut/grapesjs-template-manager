@@ -6,8 +6,6 @@ Template and page manager for grapesjs
 
 ![screenshot](screenshot.png)
 
-[DEMO](##)
-
 ### HTML
 ```html
 <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet">
