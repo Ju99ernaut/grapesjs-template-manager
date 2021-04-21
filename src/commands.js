@@ -33,7 +33,8 @@ export default (editor, opts = {}) => {
     });
 
     cm.add('save-as-template', editor => {
-        cs.setIsTemplate(true);
+        editor.Storage.getCurrentStorage()
+            .setIsTemplate(true);
         editor.store();
     });
 
