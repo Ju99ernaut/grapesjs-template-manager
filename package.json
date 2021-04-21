@@ -1,6 +1,6 @@
 {
     "name": "grapesjs-template-manager",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "Grapesjs Template Manager",
     "main": "dist/grapesjs-template-manager.min.js",
     "repository": {
