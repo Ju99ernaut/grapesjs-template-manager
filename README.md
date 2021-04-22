@@ -19,7 +19,7 @@ Template and page manager for grapesjs
 ### JS
 ```js
 const editor = grapesjs.init({
-	container: '#gjs',
+  container: '#gjs',
   height: '100%',
   fromElement: true,
   storageManager:  {
