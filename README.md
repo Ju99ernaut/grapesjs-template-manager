@@ -208,7 +208,7 @@ window.editor = grapesjs.init({
 Directly in the browser
 ```html
 <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet"/>
-<link href="https://unpkg.com/grapesjs/dist/css/grapesjs-template-manager.min.css" rel="stylesheet">
+<link href="https://unpkg.com/grapesjs-template-manager/dist/grapesjs-template-manager.min.css" rel="stylesheet">
 <script src="https://unpkg.com/grapesjs"></script>
 <script src="path/to/grapesjs-template-manager.min.js"></script>
 
