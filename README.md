@@ -9,7 +9,7 @@ Template and page manager for grapesjs
 ### HTML
 ```html
 <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet">
-<link href="https://unpkg.com/grapesjs/dist/css/grapesjs-template-manager.min.css" rel="stylesheet">
+<link href="https://unpkg.com/grapesjs-template-manager/dist/grapesjs-template-manager.min.css" rel="stylesheet">
 <script src="https://unpkg.com/grapesjs"></script>
 <script src="https://unpkg.com/grapesjs-template-manager"></script>
 
