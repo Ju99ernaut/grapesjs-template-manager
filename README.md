@@ -106,6 +106,7 @@ body, html {
 | `apiKey` | `Firebase` API key | `` |
 | `authDomain` | `Firebase` Auth domain | `` |
 | `projectId` | `Cloud Firestore` project ID | `` |
+| `firebaseConfig` | Extra firebase app credentials | `{}` |
 | `enableOffline` | Enable `Firestore` support for offline data persistence | `true` |
 | `settings` | `Firestore` database settings | `{ timestampsInSnapshots: true }` |
 | `uuidInPath` | Add uuid as path parameter on store for `rest-api`(useful for validation) | `true` |
