@@ -7,9 +7,7 @@ export default (editor, opts = {}) => {
     let db;
     let doc;
     let collection;
-    const apiKey = opts.apiKey;
-    const authDomain = opts.authDomain;
-    const projectId = opts.projectId;
+    const { apiKey, authDomain, projectId } = opts;
     const dbSettings = opts.settings;
     const onError = err => sm.onError(storageName, err.code || err);
 
@@ -18,12 +16,14 @@ export default (editor, opts = {}) => {
     const getAsyncCollection = (clb) => {
         if (collection) return clb(collection);
         if (!firebase.apps.length) {
-            firebase.initializeApp({ apiKey, authDomain, projectId });
+            firebase.initializeApp({ apiKey, authDomain, projectId, ...opts.firebaseConfig });
             db = firebase.firestore();
             db.settings(dbSettings);
         }
         else {
             firebase.app();
+            db = firebase.firestore();
+            db.settings(dbSettings);
         }
 
         const callback = () => {

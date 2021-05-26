@@ -77,6 +77,9 @@ export default (editor, opts = {}) => {
             // Enable support for offline data persistence
             enableOffline: true,
 
+            // Firebase app config
+            firebaseConfig: {},
+
             // Database settings (https://firebase.google.com/docs/reference/js/firebase.firestore.Settings)
             settings: { timestampsInSnapshots: true },
         },
