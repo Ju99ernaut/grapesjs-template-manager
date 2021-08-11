@@ -2,8 +2,26 @@ import domtoimage from 'dom-to-image';
 
 export default (editor, opts = {}) => {
     const cm = editor.Commands;
+    const { $ } = editor;
+    const mdl = editor.Modal;
+    const pfx = editor.getConfig('stylePrefix');
+    const mdlClass = `${pfx}mdl-dialog-tml`;
 
     editor.domtoimage = domtoimage;
+
+    cm.add('open-templates', {
+        run(editor, sender) {
+            const mdlDialog = document.querySelector(`.${pfx}mdl-dialog`);
+            mdlDialog.classList.add(mdlClass);
+            sender?.set && sender.set('active');
+            mdl.setTitle(opts.mdlTitle);
+            mdl.setContent(editor.TemplateManager.render());
+            mdl.open();
+            mdl.getModel().once('change:open', () => {
+                mdlDialog.classList.remove(mdlClass);
+            });
+        }
+    });
 
     //some magic from gist.github.com/jed/982883
     const uuidv4 = () => ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
