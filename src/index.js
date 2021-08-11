@@ -1,6 +1,6 @@
+import TemplateManager from './manager';
 import commands from './commands';
 import storage from './storage';
-import modal from './modal';
 
 export default (editor, opts = {}) => {
     const options = {
@@ -10,7 +10,7 @@ export default (editor, opts = {}) => {
             dbName: 'gjs',
 
             // Collection name
-            objectStoreName: 'templates',
+            objectStoreName: 'projects',
 
             // Load first template in storage
             loadFirst: true,
@@ -40,19 +40,19 @@ export default (editor, opts = {}) => {
             quality: .01,
 
             // Content for templates modal title
-            mdlTitle: 'Template Manager',
+            mdlTitle: 'Project Manager',
 
             // Content for button text
             btnText: {
-                new: 'New Page',
+                new: 'New Project',
                 edit: 'Edit Selected',
                 create: 'Create',
-                createBlank: 'Create Blank Template'
+                createBlank: 'Create Blank Project'
             },
 
             // Content for tabs
             tabsText: {
-                pages: 'Pages',
+                pages: 'All',
                 templates: 'Templates'
             },
 
@@ -60,10 +60,10 @@ export default (editor, opts = {}) => {
             nameLabel: 'Name',
 
             // Content for help message
-            help: 'Select a template, enter page name, then click create. Use edit to modify the template.',
+            help: 'Select a template, enter project name, then click create.',
 
             // Show when no pages yet pages
-            nopages: '<div style="display:flex;align-items:center;padding:50px;margin:auto;">No Pages Yet</div>',
+            nopages: '<div style="display:flex;align-items:center;padding:50px;margin:auto;">No Projects Yet</div>',
 
             // Firebase API key
             apiKey: '',
@@ -86,14 +86,14 @@ export default (editor, opts = {}) => {
         ...opts
     };
 
+    // Init and add dashboard object to editor
+    editor.TemplateManager = new TemplateManager(editor, options);
+
     // Load commands
     commands(editor, options);
 
     // Load storages
     storage(editor, options);
-
-    // Load page manager
-    modal(editor, options);
 
     // Load page with index zero
     editor.on('load', () => {
