@@ -2,7 +2,6 @@ import domtoimage from 'dom-to-image';
 
 export default (editor, opts = {}) => {
     const cm = editor.Commands;
-    const { $ } = editor;
     const mdl = editor.Modal;
     const pfx = editor.getConfig('stylePrefix');
     const mdlClass = `${pfx}mdl-dialog-tml`;

@@ -42,25 +42,14 @@ export default (editor, opts = {}) => {
             // Content for templates modal title
             mdlTitle: 'Project Manager',
 
-            // Content for button text
-            btnText: {
-                new: 'New Project',
-                edit: 'Edit Selected',
-                create: 'Create',
-                createBlank: 'Create Blank Project'
-            },
-
             // Content for tabs
             tabsText: {
                 pages: 'All',
                 templates: 'Templates'
             },
 
-            // Content for label
-            nameLabel: 'Name',
-
             // Content for help message
-            help: 'Select a template, enter project name, then click create.',
+            help: 'Select a template, enter project name, then click create. If no template is selected a blank project will be created.',
 
             // Show when no pages yet pages
             nopages: '<div style="display:flex;align-items:center;padding:50px;margin:auto;">No Projects Yet</div>',
