@@ -1,8 +1,8 @@
 {
-    "name": "grapesjs-template-manager",
+    "name": "grapesjs-project-manager",
     "version": "1.0.7",
-    "description": "Grapesjs Template Manager",
-    "main": "dist/grapesjs-template-manager.min.js",
+    "description": "Grapesjs Project Manager",
+    "main": "dist/grapesjs-project-manager.min.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/Ju99ernaut/grapesjs-template-manager.git"
@@ -10,8 +10,8 @@
     "scripts": {
         "start": "grapesjs-cli serve",
         "build": "grapesjs-cli build",
-        "build:css": "sass src/styles.scss dist/grapesjs-template-manager.min.css --style compressed",
-        "watch:scss": "sass --watch src/styles.scss dist/grapesjs-template-manager.min.css --style compressed",
+        "build:css": "sass src/styles.scss dist/grapesjs-project-manager.min.css --style compressed",
+        "watch:scss": "sass --watch src/styles.scss dist/grapesjs-project-manager.min.css --style compressed",
         "bump": "npm version patch -m 'Bump v%s'"
     },
     "keywords": [
