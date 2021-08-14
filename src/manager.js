@@ -377,6 +377,7 @@ export class PagesApp {
 
         /* Set initial app state */
         this.state = {
+            isShowing: true,
             pages: [],
             loading: false
         };
@@ -462,7 +463,7 @@ export class PagesApp {
         this.onRender();
         this.$el?.remove();
 
-        const cont = $(`<div class="pages-wrp">
+        const cont = $(`<div style="display: ${this.state.isShowing ? 'flex' : 'none'};" class="pages-wrp">
                 <div  class="flex-row">
                     <input class="tm-input" type="text" placeholder="page name" />
                 </div>
@@ -476,9 +477,23 @@ export class PagesApp {
         this.$el = cont;
         return cont;
     }
+
+    findPanel() {
+        return this.editor.Panels.getPanel('views-container');
+    }
+
+    showPanel() {
+        this.state.isShowing = true;
+        this.findPanel()?.set('appendContent', this.render()).trigger('change:appendContent');
+    }
+
+    hidePanel() {
+        this.state.isShowing = false;
+        this.render();
+    }
 }
 
-export class ProjectData {
+export class SettingsApp {
     constructor(editor, opts = {}) {
         this.editor = editor;
         this.$ = editor.$;
@@ -493,7 +508,6 @@ export class ProjectData {
 
         /* Set initial app state */
         this.state = {
-            currentPageId: '',
             tab: 'page',
             pageData: {},
             projectData: {},
@@ -578,7 +592,7 @@ export class ProjectData {
         this.onRender();
         this.$el?.remove();
 
-        const cont = $(`<div class="contents">
+        const cont = $(`<div class="app">
                 <div class="${pfx}tab">
                     <button id="page" class="${pfx}tablinks active">Page</button>
                     <button id="proejct" class="${pfx}tablinks">Project</button>
