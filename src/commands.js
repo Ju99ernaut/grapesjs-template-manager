@@ -22,6 +22,24 @@ export default (editor, opts = {}) => {
         }
     });
 
+    cm.add('open-settings', {
+        run(editor, sender) {
+            sender?.set && sender.set('active');
+            mdl.setTitle(opts.mdlTitle);
+            mdl.setContent(editor.SettingsApp.render());
+            mdl.open();
+        }
+    });
+
+    cm.add('open-pages', {
+        run(editor) {
+            editor.PagesApp.showPanel();
+        },
+        stop(editor) {
+            editor.PagesApp.hidePanel();
+        }
+    })
+
     //some magic from gist.github.com/jed/982883
     const uuidv4 = () => ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)

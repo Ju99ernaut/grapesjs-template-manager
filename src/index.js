@@ -1,4 +1,4 @@
-import TemplateManager from './manager';
+import TemplateManager, { PagesApp, SettingsApp } from './manager';
 import commands from './commands';
 import storage from './storage';
 
@@ -77,6 +77,8 @@ export default (editor, opts = {}) => {
 
     // Init and add dashboard object to editor
     editor.TemplateManager = new TemplateManager(editor, options);
+    editor.PagesApp = new PagesApp(editor, options);
+    editor.SettingsApp = new SettingsApp(editor, options);
 
     // Load commands
     commands(editor, options);
