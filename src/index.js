@@ -93,12 +93,13 @@ export default (editor, opts = {}) => {
             const firstPage = res[0];
             if (firstPage && options.loadFirst) {
                 cs.setId(firstPage.id);
-                cs.setIdx(firstPage.idx);
+                cs.setName(firstPage.name);
                 cs.setThumbnail(firstPage.thumbnail);
                 cs.setIsTemplate(firstPage.template);
                 editor.load();
             } else {
-                cs.setIdx(editor.runCommand('get-uuidv4'));
+                cs.setId(editor.runCommand('get-uuidv4'));
+                cs.setName(`Default-${cs.currentId.substr(0, 7)}`);
             }
         });
     });
