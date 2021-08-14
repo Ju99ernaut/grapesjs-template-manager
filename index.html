@@ -3,9 +3,9 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Grapesjs Template Manager</title>
+    <title>Grapesjs Project Manager</title>
     <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="dist/grapesjs-template-manager.min.css">
+    <link rel="stylesheet" href="dist/grapesjs-project-manager.min.css">
     <script src="https://unpkg.com/grapesjs"></script>
     <style>
         body,
@@ -33,12 +33,13 @@
             showOffsets: true,
             fromElement: true,
             noticeOnUnload: false,
+            pageManager: true,
             storageManager: {
                 type: 'indexeddb'
             },
-            plugins: ['grapesjs-template-manager'],
+            plugins: ['grapesjs-project-manager'],
             pluginsOpts: {
-                'grapesjs-template-manager': { /* Test here your options  */ }
+                'grapesjs-project-manager': { /* Test here your options  */ }
             }
         });
         const pn = editor.Panels;
@@ -78,6 +79,15 @@
                 id: 'take-screenshot'
             }
         ]);
+        pn.addButton('views', {
+            id: 'open-pages',
+            className: 'fa fa-file-o',
+            attributes: {
+                title: 'Take Screenshot'
+            },
+            command: 'open-pages',
+            togglable: false
+        })
     </script>
 </body>
 
