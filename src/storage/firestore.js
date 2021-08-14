@@ -43,28 +43,28 @@ export default (editor, opts = {}) => {
     const getAsyncDoc = (clb) => {
         getAsyncCollection(cll => {
             const cs = editor.Storage.getCurrentStorage();
-            doc = cll.doc(cs.currentIdx);
+            doc = cll.doc(cs.currentId);
             clb(doc);
         });
     };
 
     sm.add(storageName, {
-        currentId: 'Default',
-        currentIdx: 'uuidv4',
+        currentName: 'Default',
+        currentId: 'uuidv4',
         currentThumbnail: '',
         isTemplate: false,
         getDoc,
 
         setDocId(id) {
-            this.currentIdx = id;
+            this.currentId = id;
         },
 
         setId(id) {
             this.currentId = id;
         },
 
-        setIdx(idx) {
-            this.currentIdx = idx;
+        setName(name) {
+            this.currentName = name;
         },
 
         setThumbnail(thumbnail) {
@@ -98,10 +98,11 @@ export default (editor, opts = {}) => {
         store(data, clb, clbError) {
             getAsyncCollection(cll => {
                 cll.doc(data.idx || this.currentIdx).set({
-                    idx: this.currentIdx,
                     id: this.currentId,
+                    name: this.currentName,
                     template: this.isTemplate,
                     thumbnail: this.currentThumbnail,
+                    updated_at: Date(),
                     ...data
                 })
                     .then(clb)
@@ -110,9 +111,9 @@ export default (editor, opts = {}) => {
         },
 
         update(data, clb, clbError) {
-            const { idx, ..._data } = data;
+            const { id, ..._data } = data;
             getAsyncCollection(cll => {
-                cll.doc(idx).set(_data, { merge: true })
+                cll.doc(id).set(_data, { merge: true })
                     .then(clb)
                     .catch(clbError);
             });

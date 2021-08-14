@@ -23,8 +23,8 @@ export default (editor, opts = {}) => {
                 clb(db);
             };
             request.onupgradeneeded = e => {
-                const objs = e.currentTarget.result.createObjectStore(objsName, { keyPath: 'idx' });
-                objs.createIndex('id', 'id', { unique: false });
+                const objs = e.currentTarget.result.createObjectStore(objsName, { keyPath: 'id' });
+                objs.createIndex('name', 'name', { unique: false });
             };
         }
     };
@@ -43,8 +43,8 @@ export default (editor, opts = {}) => {
 
     // Add custom storage to the editor
     sm.add(storageName, {
-        currentId: 'Default',
-        currentIdx: 'uuidv4',
+        currentName: 'Default',
+        currentId: 'uuidv4',
         currentThumbnail: '',
         isTemplate: false,
         getDb,
@@ -55,8 +55,8 @@ export default (editor, opts = {}) => {
             this.currentId = id;
         },
 
-        setIdx(idx) {
-            this.currentIdx = idx;
+        setName(name) {
+            this.currentName = name;
         },
 
         setThumbnail(thumbnail) {
@@ -69,7 +69,7 @@ export default (editor, opts = {}) => {
 
         load(keys, clb, clbErr) {
             getAsyncObjectStore(objs => {
-                const request = objs.get(this.currentIdx);
+                const request = objs.get(this.currentId);
                 request.onerror = clbErr;
                 request.onsuccess = () => {
                     clb && clb(request.result);
@@ -90,10 +90,11 @@ export default (editor, opts = {}) => {
         store(data, clb, clbErr) {
             getAsyncObjectStore(objs => {
                 const request = objs.put({
-                    idx: this.currentIdx,
                     id: this.currentId,
+                    name: this.currentName,
                     template: this.isTemplate,
                     thumbnail: this.currentThumbnail,
+                    updated_at: Date(),
                     ...data
                 });
                 request.onerror = clbErr;
@@ -102,12 +103,12 @@ export default (editor, opts = {}) => {
         },
 
         update(data, clb, clbErr) {
-            const { idx, ..._data } = data;
+            const { id, ..._data } = data;
             getAsyncObjectStore(objs => {
-                const request = objs.get(idx);
+                const request = objs.get(id);
                 request.onerror = clbErr;
                 request.onsuccess = () => {
-                    objs.put({ idx, ...request.result, ..._data });
+                    objs.put({ id, ...request.result, ..._data });
                     clb && clb(request.result);
                 };
             });
@@ -115,7 +116,7 @@ export default (editor, opts = {}) => {
 
         delete(clb, clbErr, index) {
             getAsyncObjectStore(objs => {
-                const request = objs.delete(index || this.currentIdx);
+                const request = objs.delete(index || this.currentId);
                 request.onerror = clbErr;
                 request.onsuccess = clb;
             });

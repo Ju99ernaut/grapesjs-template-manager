@@ -7,8 +7,8 @@ export default (editor, opts = {}) => {
 
     // Add custom storage to the editor
     sm.add(storageName, {
-        currentId: 'Default',
-        currentIdx: 'uuidv4',
+        currentName: 'Default',
+        currentId: 'uuidv4',
         currentThumbnail: '',
         isTemplate: false,
 
@@ -16,8 +16,8 @@ export default (editor, opts = {}) => {
             this.currentId = id;
         },
 
-        setIdx(idx) {
-            this.currentIdx = idx;
+        setName(name) {
+            this.currentName = name;
         },
 
         setThumbnail(thumbnail) {
@@ -30,8 +30,8 @@ export default (editor, opts = {}) => {
 
         load(keys, clb, clbErr) {
             const urlLoad = remote.get('urlLoad');
-            const idx = urlLoad.endsWith("/") ? this.currentIdx : `/${this.currentIdx}`;
-            remote.set({ urlLoad: urlLoad + idx });
+            const id = urlLoad.endsWith("/") ? this.currentId : `/${this.currentId}`;
+            remote.set({ urlLoad: urlLoad + id });
             remote.load(keys, clb, clbErr);
             remote.set({ urlLoad });
         },
@@ -42,13 +42,14 @@ export default (editor, opts = {}) => {
 
         store(data, clb, clbErr) {
             const urlStore = remote.get('urlStore');
-            const idx = urlStore.endsWith("/") ? this.currentIdx : `/${this.currentIdx}`;
-            opts.uuidInPath && remote.set({ urlStore: urlStore + idx });
+            const id = urlStore.endsWith("/") ? this.currentId : `/${this.currentId}`;
+            opts.uuidInPath && remote.set({ urlStore: urlStore + id });
             remote.store({
-                idx: this.currentIdx,
                 id: this.currentId,
+                name: this.currentName,
                 template: this.isTemplate,
                 thumbnail: this.currentThumbnail,
+                updated_at: Date(),
                 ...data
             }, clb, clbErr);
             remote.set({ urlStore });
@@ -56,25 +57,25 @@ export default (editor, opts = {}) => {
 
         update(data, clb, clbErr) {
             const urlLoad = remote.get('urlLoad');
-            let { idx } = data;
-            idx = urlLoad.endsWith("/") ? idx : `/${idx}`;
-            remote.set({ urlLoad: urlLoad + idx });
+            let { id } = data;
+            id = urlLoad.endsWith("/") ? id : `/${id}`;
+            remote.set({ urlLoad: urlLoad + id });
             remote.load({}, res => {
                 const body = { ...res, ...data };
                 const method = 'post';
                 const urlUpdate = remote.get('urlStore');
-                idx = urlUpdate.endsWith("/") ? idx : `/${idx}`;
-                remote.request(urlUpdate + idx, { method, body }, clb, clbErr);
+                id = urlUpdate.endsWith("/") ? id : `/${id}`;
+                remote.request(urlUpdate + id, { method, body }, clb, clbErr);
             }, clbErr);
             remote.set({ urlLoad });
         },
 
         delete(clb, clbErr, index) {
             const urlDelete = remote.get('urlDelete');
-            let idx = index || this.currentIdx;
-            idx = urlDelete.endsWith("/") ? idx : `/${idx}`;
+            let id = index || this.currentId;
+            id = urlDelete.endsWith("/") ? id : `/${id}`;
             const method = 'delete';
-            remote.request(urlDelete + idx, { method }, clb, clbErr);
+            remote.request(urlDelete + id, { method }, clb, clbErr);
         }
     });
 }
