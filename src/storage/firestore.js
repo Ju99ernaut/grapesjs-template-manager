@@ -53,6 +53,7 @@ export default (editor, opts = {}) => {
         currentId: 'uuidv4',
         currentThumbnail: '',
         isTemplate: false,
+        description: 'No description',
         getDoc,
 
         setDocId(id) {
@@ -73,6 +74,10 @@ export default (editor, opts = {}) => {
 
         setIsTemplate(isTemplate) {
             this.isTemplate = !!isTemplate;
+        },
+
+        setDescription(description) {
+            this.description = description;
         },
 
         load(keys, clb, clbError) {
@@ -102,6 +107,7 @@ export default (editor, opts = {}) => {
                     name: this.currentName,
                     template: this.isTemplate,
                     thumbnail: this.currentThumbnail,
+                    description: this.description,
                     updated_at: Date(),
                     ...data
                 })
