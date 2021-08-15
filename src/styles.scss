@@ -99,6 +99,14 @@ $mainColor: #00ad9f;
     &:hover {
         box-shadow: 0 0 0 2px $mainColor;
     }
+
+    &.sm {
+        width: 100%;
+        min-width: 0;
+        font-size: 12px;
+        margin: 10px 0;
+        padding: 8px 10px;
+    }
 }
 
 .header {
@@ -259,6 +267,11 @@ $mainColor: #00ad9f;
     margin-top: 45px;
 }
 
+.#{$prefix}mdl-dialog-md {
+    max-width: 400px;
+    margin-top: 45px;
+}
+
 .#{$prefix}tip-about {
     padding: 10px;
     font-size: .9rem;
@@ -300,14 +313,20 @@ $mainColor: #00ad9f;
 }
 
 .pages-wrp {
-    background: #333;
     padding: 5px;
 }
 
-.add-page {
-    background: #444444;
-    color: white;
+.pages-title {
     padding: 5px;
+    margin: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, .1);
+}
+
+.add-page {
+    background: $mainColor;
+    color: white;
+    font-size: 12px;
+    padding: 8px 5px;
     border-radius: 2px;
     cursor: pointer;
     white-space: nowrap;
@@ -315,23 +334,34 @@ $mainColor: #00ad9f;
 }
 
 .page {
-    background-color: #444;
-    color: white;
+    font-size: 12px;
     padding: 5px;
     margin-bottom: 5px;
     border-radius: 2px;
+    border: 1px solid rgba(0, 0, 0, .2);
+    box-shadow: 0 1px 0 0 rgb(0, 0, 0, .15);
+    transition: all .2s ease 0s;
+    transition-property: box-shadow, color;
     cursor: pointer;
 
+    &:hover {
+        color: $mainColor;
+        box-shadow: 0 3px 4px 0 rgb(0, 0, 0, .15);
+    }
+
     &.selected {
-        background-color: #706f6f;
+        color: $mainColor;
+        border: 1px solid $mainColor;
+        background-color: rgba(255, 255, 255, .1);
     }
 }
 
 .page-close {
     opacity: .5;
     float: right;
-    background-color: #2c2c2c;
-    height: 20px;
+    background-color: rgba(0, 0, 0, .1);
+    border: 1px solid rgba(0, 0, 0, .2);
+    height: 17px;
     width: 17px;
     text-align: center;
     border-radius: 3px;
