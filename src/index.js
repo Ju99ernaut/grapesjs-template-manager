@@ -19,7 +19,7 @@ export default (editor, opts = {}) => {
             uuidInPath: true,
 
             // Indexeddb version schema
-            indexeddbVersion: 4,
+            indexeddbVersion: 5,
 
             // When template or page is deleted
             onDelete(res) {
@@ -100,6 +100,7 @@ export default (editor, opts = {}) => {
             } else {
                 cs.setId(editor.runCommand('get-uuidv4'));
                 cs.setName(`Default-${cs.currentId.substr(0, 7)}`);
+                // TODO handle fromElement
             }
         });
     });
