@@ -1,23 +1,17 @@
 import ago from './utils/timeago';
+import UI from './utils/ui';
 import { sortByDate, sortByName, matchText } from './utils/sort';
 
-export default class TemplateManager {
+export default class TemplateManager extends UI {
     constructor(editor, opts = {}) {
-        this.editor = editor;
-        this.$ = editor.$;
-        this.pfx = editor.getConfig('stylePrefix');
-        this.id = editor.Storage.getConfig().id || 'gjs-';
-        this.opts = opts;
-        this.onRender = this.onRender.bind(this);
-        this.setState = this.setState.bind(this);
-        this.handleTabs = this.handleTabs.bind(this);
+        super(editor, opts);
         this.handleSort = this.handleSort.bind(this);
         this.handleFilterInput = this.handleFilterInput.bind(this);
         this.handleNameInput = this.handleNameInput.bind(this);
 
         /* Set initial app state */
         this.state = {
-            currentProjectId: '',
+            editableProjectId: '',
             projectId: '',
             tab: 'pages',
             sites: [],
@@ -29,21 +23,8 @@ export default class TemplateManager {
         };
     }
 
-    setState(state) {
-        this.state = { ...this.state, ...state };
-        this.update();
-    }
-
-    setStateSilent(state) {
-        this.state = { ...this.state, ...state };
-    }
-
-    sm() {
-        return this.editor.Storage;
-    }
-
-    cs() {
-        return this.editor.Storage.getCurrentStorage();
+    get editableId() {
+        return this.state.editableProjectId;
     }
 
     onRender() {
@@ -55,7 +36,7 @@ export default class TemplateManager {
         });
 
         /* Fetch sites from storage API */
-        sm().getCurrentStorage().loadAll(sites => {
+        sm.getCurrentStorage().loadAll(sites => {
             /* Set sites and turn off loading state */
             setState({
                 sites,
@@ -67,13 +48,13 @@ export default class TemplateManager {
 
     handleFilterInput(e) {
         this.setState({
-            filterText: e.target.value
+            filterText: e.target.value.trim()
         });
     }
 
     handleNameInput(e) {
         this.setStateSilent({
-            nameText: e.target.value
+            nameText: e.target.value.trim()
         })
     }
 
@@ -103,12 +84,11 @@ export default class TemplateManager {
     handleOpen(e) {
         const { editor, cs } = this;
         const { projectId } = this.state;
-        cs().setIdx(projectId);
+        cs.setId(projectId);
         editor.load(res => {
-            editor.setComponents(res.components ? JSON.parse(res.components) : res.html);
-            editor.setStyle(res.styles ? JSON.parse(res.styles) : res.css);
-            cs().setThumbnail(res.thumbnail || '');
-            cs().setIsTemplate(res.template);
+            cs.setThumbnail(res.thumbnail || '');
+            cs.setIsTemplate(res.template);
+            cs.setDescription(res.description || 'No description');
             editor.Modal.close();
         });
     }
@@ -116,58 +96,65 @@ export default class TemplateManager {
     handleCreate(e) {
         const { editor, cs } = this;
         const { projectId, nameText } = this.state;
-        // TODO if no projectId generate blank project
-        // TODO if no nameText use uuid
-        //const data = {};
-        //data[`${id}html`] = '';
-        //data[`${id}css`] = '';
-        //cs.store({
-        //    idx: editor.runCommand('get-uuidv4'),
-        //    id: 'Blank',
-        //    template: true,
-        //    thumbnail: '',
-        //    ...data
-        //});
-        cs().setIdx(projectId);
-        cs().setIsTemplate(false);
-        editor.load(res => {
-            editor.setComponents(res.components ? JSON.parse(res.components) : res.html);
-            editor.setStyle(res.styles ? JSON.parse(res.styles) : res.css);
-            cs().setId(nameText);
-            cs().setIdx(editor.runCommand('get-uuidv4'));
-            cs().setThumbnail(res.thumbnail || '');
-            editor.Modal.close();
-        });
-        // TODO reset sites
+        const id = editor.runCommand('get-uuidv4').substr(0, 7);
+        let name = nameText || id;
+        if (!projectId) {
+            cs.store({
+                id,
+                name,
+                template: false,
+                thumbnail: '',
+                styles: '',
+                description: 'No description',
+                pages: [{
+                    name: 'index',
+                    component: ''
+                }]
+            }, res => {
+                cs.setId(id);
+                cs.setIsTemplate(false);
+                editor.load(res => {
+                    cs.setId(res.id);
+                    cs.setName(res.name);
+                    cs.setThumbnail(res.thumbnail || '');
+                    cs.setDescription(res.description || 'No description');
+                    editor.Modal.close();
+                });
+            });
+        } else {
+            cs.setId(projectId);
+            cs.setIsTemplate(false);
+            editor.load(res => {
+                cs.setId(res.id);
+                cs.setName(res.name);
+                cs.setThumbnail(res.thumbnail || '');
+                cs.setDescription(res.description || 'No description');
+                editor.Modal.close();
+            });
+        }
     }
 
-    handleEdit(e) {
-        const input = this.$el?.find('input.edit');
-        this.cs().update({
-            idx: e.currentTarget.dataset.idx,
-            id: input.val().trim(),
-            description: '',
-            thumbnail: '',
-            template: '',
-            updated_at: ''
+
+    openEdit(e) {
+        this.setStateSilent({
+            editableProjectId: e.currentTarget.dataset.id
         });
-        // TODO reset sites
+        this.editor.Modal.close();
+        // TODO set project tab
+        this.editor.runCommand('open-settings');
+    }
+
+    handleEdit(data) {
+        this.cs.update({ ...data, updated_at: Date() });
+        this.sm.getCurrentStorage().loadAll(sites => setState({ sites }),
+            err => console.log("Error", err));
     }
 
     handleDelete(e) {
-        const { cs, opts } = this;
-        cs().delete(opts.onDelete, opts.onDeleteError, e.currentTarget.dataset.idx);
-        // TODO reset sites
-    }
-
-    renderAutoThumb(html, css) {
-        return `<svg xmlns="http://www.w3.org/2000/svg" class="template-preview" viewBox="0 0 1300 1100" width="99%" height="220">
-                <foreignObject width="100%" height="100%" style="pointer-events:none">
-                    <div xmlns="http://www.w3.org/1999/xhtml">
-                        ${html + '<style scoped>' + css + '</style>'}
-                    </div>
-                </foreignObject>
-            </svg>`;
+        const { cs, sm, opts } = this;
+        cs.delete(opts.onDelete, opts.onDeleteError, e.currentTarget.dataset.id);
+        sm.getCurrentStorage().loadAll(sites => setState({ sites }),
+            err => console.log("Error", err));
     }
 
     renderSiteList() {
@@ -193,10 +180,10 @@ export default class TemplateManager {
                 return true;
             }
 
-            const { id, idx, template } = site;
+            const { id, name, template } = site;
             if (
                 (matchText(filterText, id) ||
-                    matchText(filterText, idx)) &&
+                    matchText(filterText, name)) &&
                 tab === 'pages'
             ) {
                 return true;
@@ -212,21 +199,21 @@ export default class TemplateManager {
             .map((site, i) => {
                 const {
                     id,
-                    idx,
+                    name,
                     thumbnail,
                     created_at,
                     updated_at
                 } = site;
                 const time = updated_at ? ago(new Date(updated_at).getTime()) : 'NA';
                 const createdAt = created_at ? ago(new Date(created_at).getTime()) : 'NA';
-                const pageNames = ''//pages.map(page => page.n).join(', ');
-                return `<div class="site-wrapper" key="${i}" data-id="${idx}" title="Select to open site">
+                const pageNames = '';//pages.map(page => page.n).join(', ');
+                return `<div class="site-wrapper" key="${i}" data-id="${id}" title="Select to open site">
                         <div class="site-screenshot">
                             <img src="${thumbnail}" alt="" />
                         </div>
                         <div class="site-info">
                             <h2>
-                                ${id}
+                                ${name}
                             </h2>
                             <div class="site-meta">
                                 Project description
@@ -240,8 +227,8 @@ export default class TemplateManager {
                         </div>
                         <div class="site-create-time">${createdAt}</div>
                         <div class="site-actions">
-                            <i class="${pfx}caret-icon fa fa-hand-pointer-o" title="edit" data-idx="${idx}"></i>
-                            <i class="${pfx}caret-icon fa fa-trash-o" title="delete" data-idx="${idx}"></i>
+                            <i class="${pfx}caret-icon fa fa-hand-pointer-o" title="edit" data-id="${id}"></i>
+                            <i class="${pfx}caret-icon fa fa-trash-o" title="delete" data-id="${id}"></i>
                         </div>
                     </div>`;
             }).join('\n');
@@ -363,33 +350,27 @@ export default class TemplateManager {
     }
 }
 
-export class PagesApp {
+export class PagesApp extends UI {
     constructor(editor, opts = {}) {
-        this.editor = editor;
-        this.$ = editor.$;
-        this.pfx = editor.getConfig('stylePrefix');
-        this.id = editor.Storage.getConfig().id || 'gjs-';
-        this.opts = opts;
-        this.onRender = this.onRender.bind(this);
+        super(editor, opts);
         this.addPage = this.addPage.bind(this);
         this.selectPage = this.selectPage.bind(this);
         this.removePage = this.removePage.bind(this);
+        this.isSelected = this.isSelected.bind(this);
+        this.handleNameInput = this.handleNameInput.bind(this);
 
         /* Set initial app state */
         this.state = {
+            editablePageId: '',
             isShowing: true,
+            nameText: '',
             pages: [],
             loading: false
         };
     }
 
-    pm() {
-        return editor.Pages;
-    }
-
-    setState(state) {
-        this.state = { ...this.state, ...state };
-        this.update();
+    get editableId() {
+        return this.state.editablePageId;
     }
 
     onRender() {
@@ -398,11 +379,11 @@ export class PagesApp {
             loading: true
         });
         setState({
-            pages: [...pm().getAll()]
+            pages: [...pm.getAll()]
         });
         editor.on('page', () => {
             setState({
-                pages: [...pm().getAll()]
+                pages: [...pm.getAll()]
             })
         });
         setState({
@@ -411,27 +392,49 @@ export class PagesApp {
     }
 
     isSelected(page) {
-        return this.pm().getSelected().id === page.id;
+        return this.pm.getSelected().id === page.id;
     }
 
     selectPage(e) {
-        this.pm().select(e.currentTarget.dataset.key);
+        this.pm.select(e.currentTarget.dataset.key);
         this.update();
     }
 
     removePage(e) {
-        this.pm().remove(e.currentTarget.dataset.key);
+        this.pm.remove(e.currentTarget.dataset.key);
         this.update();
+    }
+
+    openEdit(e) {
+        this.setStateSilent({
+            editablePageId: e.currentTarget.dataset.key
+        });
+        this.editor.Modal.close();
+        // TODO set page tab
+        this.editor.runCommand('open-settings');
+    }
+
+    editPage(id, name) {
+        const currentPage = this.pm.get(id);
+        currentPage?.set('name', name);
+        this.update()
     }
 
     addPage() {
         const { pm } = this;
-        const len = pm().getAll().length;
-        pm().add({
-            name: `Page ${len + 1}`,
+        const { nameText } = this.state
+        if (!nameText) return;
+        pm.add({
+            name: nameText,
             component: ''
         });
         this.update();
+    }
+
+    handleNameInput(e) {
+        this.setStateSilent({
+            nameText: e.target.value.trim()
+        })
     }
 
     renderPagesList() {
@@ -441,18 +444,20 @@ export class PagesApp {
         if (loading) return opts.loader || '<div>Loading pages...</div>';
 
         return pages.map((page, i) => `<div 
-                data-idx="${i}" 
+                data-id="${i}" 
                 data-key="${page.id}"  
                 class="page ${isSelected(page) ? 'selected' : ''}"
             >
                 ${page.get('name') || page.id}
-                ${isSelected(page) ? '<span class="page-close" data-key="${page.id}">&Cross</span>' : ''}
-            </div>`);
+                <span class="page-edit" data-key="${page.id}"><i class="fa fa-pencil"></i></span>
+                ${isSelected(page) ? '' : '<span class="page-close" data-key="${page.id}">&Cross;</span>'}
+            </div>`).join("\n");
     }
 
     update() {
         this.$el?.find('.pages').html(this.renderPagesList());
         this.$el?.find('.page').on('click', this.selectPage);
+        this.$el?.find('.page-edit').on('click', this.openEdit);
         this.$el?.find('.page-close').on('click', this.removePage);
     }
 
@@ -464,27 +469,28 @@ export class PagesApp {
         this.$el?.remove();
 
         const cont = $(`<div style="display: ${this.state.isShowing ? 'flex' : 'none'};" class="pages-wrp">
-                <div  class="flex-row">
-                    <input class="tm-input" type="text" placeholder="page name" />
-                </div>
-                <div class="add-page">Add New Page</div>
                 <div class="pages">
                     ${this.renderPagesList()}
                 </div>
+                <div  class="flex-row">
+                    <input class="tm-input sm" type="text" placeholder="page name" />
+                </div>
+                <div class="add-page">New Page</div>
             </div>`);
         cont.find('.add-page').on('click', this.addPage);
+        cont.find('input').on('change', this.handleNameInput);
 
         this.$el = cont;
         return cont;
     }
 
-    findPanel() {
+    get findPanel() {
         return this.editor.Panels.getPanel('views-container');
     }
 
     showPanel() {
         this.state.isShowing = true;
-        this.findPanel()?.set('appendContent', this.render()).trigger('change:appendContent');
+        this.findPanel?.set('appendContent', this.render()).trigger('change:appendContent');
     }
 
     hidePanel() {
@@ -493,16 +499,9 @@ export class PagesApp {
     }
 }
 
-export class SettingsApp {
+export class SettingsApp extends UI {
     constructor(editor, opts = {}) {
-        this.editor = editor;
-        this.$ = editor.$;
-        this.pfx = editor.getConfig('stylePrefix');
-        this.id = editor.Storage.getConfig().id || 'gjs-';
-        this.opts = opts;
-        this.onRender = this.onRender.bind(this);
-        this.setState = this.setState.bind(this);
-        this.handleTabs = this.handleTabs.bind(this);
+        super(editor, opts);
         this.handleSave = this.handleSave.bind(this);
         this.handleThumbnail = this.handleThumbnail.bind(this);
 
@@ -515,17 +514,12 @@ export class SettingsApp {
         };
     }
 
-    setState(state) {
-        this.state = { ...this.state, ...state };
-        this.update();
-    }
-
-    setStateSilent(state) {
-        this.state = { ...this.state, ...state };
+    setTab(tab) {
+        this.state.tab = tab;
     }
 
     update() {
-        this.$el?.find('#setings').html(this.renderSettings());
+        this.$el?.find('#settings').html(this.renderSettings());
         this.$el?.find('#save').on('click', this.handleSave);
     }
 
@@ -552,7 +546,9 @@ export class SettingsApp {
         }
     }
 
-    handleSave(e) { }
+    handleSave(e) {
+        // TODO check tab, get id, if id, run related update
+    }
 
     handleThumbnail(e) { }
 
@@ -560,7 +556,7 @@ export class SettingsApp {
         const { tab, loading } = this.state;
         const { opts, pfx } = this;
 
-        if (loading) return opts.loader || '<div>Loading pages...</div>';
+        if (loading) return opts.loader || '<div>Loading settings...</div>';
 
         if (tab === 'page') {
             return `<div class="flex-row">
@@ -570,6 +566,8 @@ export class SettingsApp {
             return `<div class="${pfx}tip-about ${pfx}four-color">Enter url, select from asset manager or generate thumbnail.</div>
             <div class="flex-row">
                 <input class="thumbnail tm-input" placeholder="Project thumbnail"/>
+            </div>
+            <div class="flex-row">
                 <button id="assets" class="primary-button">Assets</button>
                 <button id="generate" class="primary-button">Generate</button>
             </div>
@@ -580,7 +578,7 @@ export class SettingsApp {
                 <input class="desc tm-input" placeholder="Project description"/>
             </div>
             <div class="flex-row">
-                <input class="template tm-input" type="checkbox"/>
+                <input class="template" type="checkbox"/>
             </div>`
         }
     }
@@ -595,7 +593,7 @@ export class SettingsApp {
         const cont = $(`<div class="app">
                 <div class="${pfx}tab">
                     <button id="page" class="${pfx}tablinks active">Page</button>
-                    <button id="proejct" class="${pfx}tablinks">Project</button>
+                    <button id="project" class="${pfx}tablinks">Project</button>
                 </div>
                 <div id="settings">
                     ${this.renderSettings()}
@@ -604,6 +602,7 @@ export class SettingsApp {
                     <button id="save" class="primary-button">Save</button>
                 </div>
             </div>`);
+        cont.find('#page, #project').on('click', this.handleTabs);
 
         this.$el = cont;
         return cont;
