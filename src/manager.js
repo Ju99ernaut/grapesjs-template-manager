@@ -136,12 +136,13 @@ export default class TemplateManager extends UI {
 
 
     openEdit(e) {
+        const { editor } = this;
         this.setStateSilent({
             editableProjectId: e.currentTarget.dataset.id
         });
-        this.editor.Modal.close();
-        // TODO set project tab
-        this.editor.runCommand('open-settings');
+        editor.Modal.close();
+        editor.SettingsApp.setTab('project');
+        editor.runCommand('open-settings');
     }
 
     handleEdit(data) {
@@ -358,6 +359,7 @@ export class PagesApp extends UI {
         this.removePage = this.removePage.bind(this);
         this.isSelected = this.isSelected.bind(this);
         this.handleNameInput = this.handleNameInput.bind(this);
+        this.openEdit = this.openEdit.bind(this);
 
         /* Set initial app state */
         this.state = {
@@ -406,12 +408,13 @@ export class PagesApp extends UI {
     }
 
     openEdit(e) {
+        const { editor } = this;
         this.setStateSilent({
             editablePageId: e.currentTarget.dataset.key
         });
-        this.editor.Modal.close();
-        // TODO set page tab
-        this.editor.runCommand('open-settings');
+        editor.Modal.close();
+        editor.SettingsApp.setTab('page');
+        editor.runCommand('open-settings');
     }
 
     editPage(id, name) {
@@ -448,9 +451,10 @@ export class PagesApp extends UI {
                 data-key="${page.id}"  
                 class="page ${isSelected(page) ? 'selected' : ''}"
             >
+                <i class="fa fa-file-o" style="margin:5px;"></i>
                 ${page.get('name') || page.id}
-                <span class="page-edit" data-key="${page.id}"><i class="fa fa-pencil"></i></span>
-                ${isSelected(page) ? '' : '<span class="page-close" data-key="${page.id}">&Cross;</span>'}
+                ${isSelected(page) ? '' : `<span class="page-close" data-key="${page.id}">&Cross;</span>`}
+                <span class="page-edit" data-key="${page.id}"><i class="fa fa-hand-pointer-o"></i></span>
             </div>`).join("\n");
     }
 
@@ -491,6 +495,7 @@ export class PagesApp extends UI {
     showPanel() {
         this.state.isShowing = true;
         this.findPanel?.set('appendContent', this.render()).trigger('change:appendContent');
+        this.update();
     }
 
     hidePanel() {
@@ -548,19 +553,28 @@ export class SettingsApp extends UI {
 
     handleSave(e) {
         // TODO check tab, get id, if id, run related update
+        const { $el, editor } = this;
+        const { tab } = this.state;
+        if (tab === 'page') {
+            const id = editor.PagesApp.editableId;
+            const name = $el?.find('input.name').val().trim();
+            id && editor.PagesApp.editPage(id, name);
+        }
     }
 
     handleThumbnail(e) { }
 
     renderSettings() {
         const { tab, loading } = this.state;
-        const { opts, pfx } = this;
+        const { opts, pfx, pm, editor } = this;
 
         if (loading) return opts.loader || '<div>Loading settings...</div>';
 
         if (tab === 'page') {
+            const page = pm.get(editor.PagesApp.editableId);
+            const value = page?.get('name') || page?.id || '';
             return `<div class="flex-row">
-                <input class="name tm-input" placeholder="Current page name"/>
+                <input class="name tm-input" value="${value}" placeholder="Current page name"/>
             </div>`
         } else {
             return `<div class="${pfx}tip-about ${pfx}four-color">Enter url, select from asset manager or generate thumbnail.</div>
