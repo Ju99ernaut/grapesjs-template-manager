@@ -27,8 +27,12 @@ export default class TemplateManager extends UI {
         return this.state.editableProjectId;
     }
 
+    get allSites() {
+        return this.state.sites;
+    }
+
     onRender() {
-        const { setState, sm } = this;
+        const { setState, cs } = this;
 
         /* Set request loading state */
         setState({
@@ -36,7 +40,7 @@ export default class TemplateManager extends UI {
         });
 
         /* Fetch sites from storage API */
-        sm.getCurrentStorage().loadAll(sites => {
+        cs.loadAll(sites => {
             /* Set sites and turn off loading state */
             setState({
                 sites,
@@ -136,8 +140,8 @@ export default class TemplateManager extends UI {
 
 
     openEdit(e) {
-        const { editor } = this;
-        this.setStateSilent({
+        const { editor, setStateSilent } = this;
+        setStateSilent({
             editableProjectId: e.currentTarget.dataset.id
         });
         editor.Modal.close();
@@ -146,21 +150,22 @@ export default class TemplateManager extends UI {
     }
 
     handleEdit(data) {
-        this.cs.update({ ...data, updated_at: Date() });
-        this.sm.getCurrentStorage().loadAll(sites => setState({ sites }),
+        const { cs } = this;
+        cs.update({ ...data, updated_at: Date() });
+        cs.loadAll(sites => setState({ sites }),
             err => console.log("Error", err));
     }
 
     handleDelete(e) {
-        const { cs, sm, opts } = this;
+        const { cs, opts } = this;
         cs.delete(opts.onDelete, opts.onDeleteError, e.currentTarget.dataset.id);
-        sm.getCurrentStorage().loadAll(sites => setState({ sites }),
+        cs.loadAll(sites => setState({ sites }),
             err => console.log("Error", err));
     }
 
     renderSiteList() {
         const { sites, tab, filterText, loading, sortBy, sortOrder } = this.state;
-        const { pfx, opts } = this;
+        const { pfx, opts, cs } = this;
 
         if (loading) return opts.loader || '<div>Loading sites...</div>';
 
@@ -201,6 +206,7 @@ export default class TemplateManager extends UI {
                 const {
                     id,
                     name,
+                    description,
                     thumbnail,
                     created_at,
                     updated_at
@@ -217,7 +223,7 @@ export default class TemplateManager extends UI {
                                 ${name}
                             </h2>
                             <div class="site-meta">
-                                Project description
+                                ${description}
                             </div>
                         </div>
                         <div class="site-update-time">${time}</div>
@@ -229,7 +235,9 @@ export default class TemplateManager extends UI {
                         <div class="site-create-time">${createdAt}</div>
                         <div class="site-actions">
                             <i class="${pfx}caret-icon fa fa-hand-pointer-o" title="edit" data-id="${id}"></i>
-                            <i class="${pfx}caret-icon fa fa-trash-o" title="delete" data-id="${id}"></i>
+                            ${cs.currentId === id ?
+                        `<i class="${pfx}caret-icon fa fa-trash-o" title="delete" data-id="${id}"></i>`
+                        : ''}
                         </div>
                     </div>`;
             }).join('\n');
@@ -526,6 +534,7 @@ export class SettingsApp extends UI {
     update() {
         this.$el?.find('#settings').html(this.renderSettings());
         this.$el?.find('#save').on('click', this.handleSave);
+        this.$el?.find('#generate').on('click', this.handleThumbnail);
     }
 
     onRender() {
@@ -533,7 +542,7 @@ export class SettingsApp extends UI {
         setState({
             loading: true
         });
-        // TODO Setup
+        //? Setup code here 
         setState({
             loading: false
         });
@@ -552,17 +561,30 @@ export class SettingsApp extends UI {
     }
 
     handleSave(e) {
-        // TODO check tab, get id, if id, run related update
         const { $el, editor } = this;
         const { tab } = this.state;
         if (tab === 'page') {
             const id = editor.PagesApp.editableId;
             const name = $el?.find('input.name').val().trim();
             id && editor.PagesApp.editPage(id, name);
+        } else {
+            const id = editor.TemplateManager.editableId;
+            const thumbnail = $el?.find('input.thumbnail').val().trim();
+            const name = $el?.find('input.name').val().trim();
+            const description = $el?.find('input.desc').val().trim();
+            const template = !!$el?.find('input.template').val();
+            id && editor.TemplateManager.handleEdit({ id, thumbnail, name, description, template });
         }
     }
 
-    handleThumbnail(e) { }
+    handleThumbnail(e) {
+        const { editor, $el } = this;
+        editor.runCommand('take-screenshot', {
+            clb(dataUrl) {
+                $el?.find('input.thumbnail').val(dataUrl);
+            }
+        })
+    }
 
     renderSettings() {
         const { tab, loading } = this.state;
@@ -577,22 +599,26 @@ export class SettingsApp extends UI {
                 <input class="name tm-input" value="${value}" placeholder="Current page name"/>
             </div>`
         } else {
-            return `<div class="${pfx}tip-about ${pfx}four-color">Enter url, select from asset manager or generate thumbnail.</div>
+            const clb = site => site.id === editor.TemplateManager.editableId;
+            const site = editor.TemplateManager.allSites.find(clb);
+            return `<div class="${pfx}tip-about ${pfx}four-color">Enter url, or generate thumbnail.</div>
             <div class="flex-row">
-                <input class="thumbnail tm-input" placeholder="Project thumbnail"/>
+                <input class="thumbnail tm-input" value="${site?.thumbnail || ''}" placeholder="Project thumbnail"/>
             </div>
             <div class="flex-row">
-                <button id="assets" class="primary-button">Assets</button>
+                <div class="site-screenshot">
+                    <img src="${site?.thumbnail || ''}" alt="" />
+                </div>
                 <button id="generate" class="primary-button">Generate</button>
             </div>
             <div class="flex-row">
-                <input class="name tm-input" placeholder="Project name"/>
+                <input class="name tm-input" value="${site?.name || ''}" placeholder="Project name"/>
             </div>
             <div class="flex-row">
-                <input class="desc tm-input" placeholder="Project description"/>
+                <input class="desc tm-input" value="${site?.description || ''}" placeholder="Project description"/>
             </div>
             <div class="flex-row">
-                <input class="template" type="checkbox"/>
+                <input class="template" type="checkbox" ${site?.template ? 'checked' : ''}/>
             </div>`
         }
     }
