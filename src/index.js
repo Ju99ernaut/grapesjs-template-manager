@@ -100,7 +100,8 @@ export default (editor, opts = {}) => {
             } else {
                 cs.setId(editor.runCommand('get-uuidv4'));
                 cs.setName(`Default-${cs.currentId.substr(0, 7)}`);
-                // TODO handle fromElement
+                options.components && editor.setComponents(options.components);
+                options.style && editor.setStyle(options.style);
             }
         });
     });
