@@ -2,6 +2,7 @@ import domtoimage from 'dom-to-image';
 
 export default (editor, opts = {}) => {
     const cm = editor.Commands;
+    const cs = editor.Storage.getCurrentStorage();
     const mdl = editor.Modal;
     const pfx = editor.getConfig('stylePrefix');
     const mdlClass = `${pfx}mdl-dialog-tml`;
@@ -59,9 +60,8 @@ export default (editor, opts = {}) => {
 
     cm.add('get-uuidv4', () => uuidv4());
 
-    cm.add('take-screenshot', editor => {
+    cm.add('take-screenshot', (editor, s, opts = { clb(d) { return d } }) => {
         const el = editor.getWrapper().getEl();
-        const clb = dataUrl => editor.Storage.getCurrentStorage().setThumbnail(dataUrl);
         getJpeg(el, {
             quality: opts.quality,
             height: 1000,
@@ -74,13 +74,11 @@ export default (editor, opts = {}) => {
     });
 
     cm.add('save-as-template', editor => {
-        editor.Storage.getCurrentStorage()
-            .setIsTemplate(true);
+        cs.setIsTemplate(true);
         editor.store();
     });
 
     cm.add('delete-template', editor => {
-        editor.Storage.getCurrentStorage()
-            .delete(opts.onDelete, opts.onDeleteError);
+        cs.delete(opts.onDelete, opts.onDeleteError);
     });
 }
