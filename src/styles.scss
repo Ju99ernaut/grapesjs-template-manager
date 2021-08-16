@@ -1,7 +1,7 @@
 /* Class names prefixes */
 $prefix: 'gjs-' !default;
 /* Main color */
-$mainColor: #00ad9f;
+$mainColor: #73308d;
 
 :root {
     --border-color: rgba(0, 0, 0, 0.15);
@@ -335,6 +335,7 @@ $mainColor: #00ad9f;
 
 .page {
     font-size: 12px;
+    text-align: left;
     padding: 5px;
     margin-bottom: 5px;
     border-radius: 2px;
@@ -356,6 +357,7 @@ $mainColor: #00ad9f;
     }
 }
 
+.page-edit,
 .page-close {
     opacity: .5;
     float: right;
@@ -369,6 +371,10 @@ $mainColor: #00ad9f;
     &:hover {
         opacity: 1;
     }
+}
+
+.page-edit {
+    margin-right: 5px;
 }
 
 @keyframes fadein {
