@@ -7,9 +7,6 @@ export default class UI {
         this.opts = opts;
         this.setState = this.setState.bind(this);
         this.setStateSilent = this.setStateSilent.bind(this);
-        this.sm = this.sm.bind(this);
-        this.pm = this.pm.bind(this);
-        this.cs = this.cs.bind(this);
         this.onRender = this.onRender.bind(this);
         this.handleTabs = this.handleTabs.bind(this);
     }
