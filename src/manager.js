@@ -8,6 +8,10 @@ export default class TemplateManager extends UI {
         this.handleSort = this.handleSort.bind(this);
         this.handleFilterInput = this.handleFilterInput.bind(this);
         this.handleNameInput = this.handleNameInput.bind(this);
+        this.handleOpen = this.handleOpen.bind(this);
+        this.handleCreate = this.handleCreate.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
+        this.openEdit = this.openEdit.bind(this);
 
         /* Set initial app state */
         this.state = {
@@ -88,6 +92,7 @@ export default class TemplateManager extends UI {
     handleOpen(e) {
         const { editor, cs } = this;
         const { projectId } = this.state;
+        if (!projectId) return;
         cs.setId(projectId);
         editor.load(res => {
             cs.setThumbnail(res.thumbnail || '');
@@ -234,10 +239,8 @@ export default class TemplateManager extends UI {
                         </div>
                         <div class="site-create-time">${createdAt}</div>
                         <div class="site-actions">
-                            <i class="${pfx}caret-icon fa fa-hand-pointer-o" title="edit" data-id="${id}"></i>
-                            ${cs.currentId === id ?
-                        `<i class="${pfx}caret-icon fa fa-trash-o" title="delete" data-id="${id}"></i>`
-                        : ''}
+                            <i class="${pfx}caret-icon fa fa-hand-pointer-o edit" title="edit" data-id="${id}"></i>
+                            ${!(cs.currentId === id) ? `<i class="${pfx}caret-icon fa fa-trash-o delete" title="delete" data-id="${id}"></i>` : ''}
                         </div>
                     </div>`;
             }).join('\n');
@@ -286,6 +289,8 @@ export default class TemplateManager extends UI {
         }
         this.$el?.find('#open').on('click', this.handleOpen);
         this.$el?.find('#create').on('click', this.handleCreate);
+        this.$el?.find('i.edit').on('click', this.openEdit);
+        this.$el?.find('i.delete').on('click', this.handleDelete);
     }
 
     render() {
@@ -521,8 +526,6 @@ export class SettingsApp extends UI {
         /* Set initial app state */
         this.state = {
             tab: 'page',
-            pageData: {},
-            projectData: {},
             loading: false
         };
     }
@@ -548,18 +551,6 @@ export class SettingsApp extends UI {
         });
     }
 
-    handleTabs(e) {
-        const { target } = e;
-        const { $el, pfx, $ } = this;
-        $el.find(`.${pfx}tablinks`).removeClass('active');
-        $(target).addClass('active');
-        if (target.id === 'page') {
-            this.setState({ tab: 'page' });
-        } else {
-            this.setState({ tab: 'project' });
-        }
-    }
-
     handleSave(e) {
         const { $el, editor } = this;
         const { tab } = this.state;
@@ -575,6 +566,7 @@ export class SettingsApp extends UI {
             const template = !!$el?.find('input.template').val();
             id && editor.TemplateManager.handleEdit({ id, thumbnail, name, description, template });
         }
+        editor.Modal.close();
     }
 
     handleThumbnail(e) {
@@ -582,6 +574,7 @@ export class SettingsApp extends UI {
         editor.runCommand('take-screenshot', {
             clb(dataUrl) {
                 $el?.find('input.thumbnail').val(dataUrl);
+                $el?.find('img').setAttr('src', dataUrl);
             }
         })
     }
@@ -595,31 +588,36 @@ export class SettingsApp extends UI {
         if (tab === 'page') {
             const page = pm.get(editor.PagesApp.editableId);
             const value = page?.get('name') || page?.id || '';
-            return `<div class="flex-row">
-                <input class="name tm-input" value="${value}" placeholder="Current page name"/>
-            </div>`
+            return `<label for="name">Name</label>
+                <div class="flex-row">
+                    <input class="name tm-input" value="${value}" placeholder="Current page name"/>
+                </div>`
         } else {
             const clb = site => site.id === editor.TemplateManager.editableId;
             const site = editor.TemplateManager.allSites.find(clb);
             return `<div class="${pfx}tip-about ${pfx}four-color">Enter url, or generate thumbnail.</div>
-            <div class="flex-row">
-                <input class="thumbnail tm-input" value="${site?.thumbnail || ''}" placeholder="Project thumbnail"/>
-            </div>
-            <div class="flex-row">
-                <div class="site-screenshot">
-                    <img src="${site?.thumbnail || ''}" alt="" />
+                <label for="thumbnail">Thumbnail</label>
+                <div class="flex-row">
+                    <input class="thumbnail tm-input" value="${site?.thumbnail || ''}" placeholder="Project thumbnail"/>
                 </div>
-                <button id="generate" class="primary-button">Generate</button>
-            </div>
-            <div class="flex-row">
-                <input class="name tm-input" value="${site?.name || ''}" placeholder="Project name"/>
-            </div>
-            <div class="flex-row">
-                <input class="desc tm-input" value="${site?.description || ''}" placeholder="Project description"/>
-            </div>
-            <div class="flex-row">
-                <input class="template" type="checkbox" ${site?.template ? 'checked' : ''}/>
-            </div>`
+                <div class="flex-row" style="margin-bottom:15px;">
+                    <div class="site-screenshot">
+                        <img src="${site?.thumbnail || ''}" alt="screenshot" />
+                    </div>
+                    <button id="generate" class="primary-button">Generate</button>
+                </div>
+                <label for="name">Name</label>
+                <div class="flex-row">
+                    <input id="name" class="name tm-input" value="${site?.name || ''}" placeholder="Project name"/>
+                </div>
+                <label for="desc">Description</label>
+                <div class="flex-row">
+                    <input id="desc" class="desc tm-input" value="${site?.description || ''}" placeholder="Project description"/>
+                </div>
+                <div class="flex-row group">
+                    <input id="template" class="template" type="checkbox" ${site?.template ? 'checked' : ''}/>
+                    <label for="template">Template</label>
+                </div>`
         }
     }
 
@@ -631,10 +629,6 @@ export class SettingsApp extends UI {
         this.$el?.remove();
 
         const cont = $(`<div class="app">
-                <div class="${pfx}tab">
-                    <button id="page" class="${pfx}tablinks active">Page</button>
-                    <button id="project" class="${pfx}tablinks">Project</button>
-                </div>
                 <div id="settings">
                     ${this.renderSettings()}
                 </div>
