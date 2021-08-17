@@ -1,7 +1,7 @@
 /* Class names prefixes */
 $prefix: 'gjs-' !default;
 /* Main color */
-$mainColor: #73308d;
+$mainColor: #936a9b;
 
 :root {
     --border-color: rgba(0, 0, 0, 0.15);
@@ -353,7 +353,7 @@ $mainColor: #73308d;
     &.selected {
         color: $mainColor;
         border: 1px solid $mainColor;
-        background-color: rgba(255, 255, 255, .1);
+        background-color: rgba(0, 0, 0, .1);
     }
 }
 
@@ -375,6 +375,51 @@ $mainColor: #73308d;
 
 .page-edit {
     margin-right: 5px;
+}
+
+.group {
+    margin-bottom: 15px;
+
+    input {
+        padding: 0;
+        height: initial;
+        width: initial;
+        margin-bottom: 0;
+        display: none;
+        cursor: pointer;
+
+        &:checked+label:after {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 2px;
+            left: 9px;
+            width: 6px;
+            height: 14px;
+            border: solid $mainColor;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+    }
+
+    label {
+        position: relative;
+        cursor: pointer;
+
+        &:before {
+            content: '';
+            -webkit-appearance: none;
+            background-color: transparent;
+            border: 2px solid $mainColor;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px -15px 10px -12px rgba(0, 0, 0, 0.05);
+            padding: 10px;
+            display: inline-block;
+            position: relative;
+            vertical-align: middle;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+    }
 }
 
 @keyframes fadein {
