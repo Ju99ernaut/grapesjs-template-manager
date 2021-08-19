@@ -60,7 +60,7 @@ export default (editor, opts = {}) => {
 
     cm.add('get-uuidv4', () => uuidv4());
 
-    cm.add('take-screenshot', (editor, s, opts = { clb(d) { return d } }) => {
+    cm.add('take-screenshot', (editor, s, options = { clb(d) { return d } }) => {
         const el = editor.getWrapper().getEl();
         getJpeg(el, {
             quality: opts.quality,
@@ -70,7 +70,7 @@ export default (editor, opts = {}) => {
                 'background-color': 'white',
                 ...editor.getWrapper().getStyle()
             },
-        }, clb, opts.onScreenshotError);
+        }, options.clb, opts.onScreenshotError);
     });
 
     cm.add('save-as-template', editor => {
