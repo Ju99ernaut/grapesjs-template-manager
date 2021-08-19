@@ -67,7 +67,7 @@ $mainColor: #936a9b;
 }
 
 .primary-button:hover {
-    background: #00c2b2;
+    background: #73308d;
 }
 
 .flex-row {
@@ -139,6 +139,10 @@ $mainColor: #936a9b;
     border: 2px solid $mainColor;
 }
 
+.site-wrapper.open {
+    background-color: rgba(147, 106, 155, .2);
+}
+
 .site-wrapper-header {
     padding-left: 15px;
     border-bottom: 2px solid rgba(14, 30, 37, .2);
@@ -160,6 +164,7 @@ $mainColor: #936a9b;
     margin: 0 24px 0 0;
     min-width: 102.4px;
     position: relative;
+    overflow: hidden;
 }
 
 .site-screenshot-header {
