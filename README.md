@@ -1,17 +1,19 @@
-# Grapesjs Template Manager
+# Grapesjs Project Manager
 
->(WIP)Pending some error fixes and feature implementations .Requires GrapesJS v0.14.15 or higher
+> Requires GrapesJS v0.17.3 or higher.
 
-Template and page manager for grapesjs
+Project, template and page manager for grapesjs. This version makes use of the [`PageManager`](#), the previous version which doesn't make use of the `PageManager` can be found [here](#).
 
-![screenshot](screenshot.png)
+| Project | Project settings | Pages | Page settings |
+|---------|------------------|-------|---------------|\
+| | | | |
 
 ### HTML
 ```html
 <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet">
-<link href="https://unpkg.com/grapesjs-template-manager/dist/grapesjs-template-manager.min.css" rel="stylesheet">
+<link href="https://unpkg.com/grapesjs-project-manager/dist/grapesjs-project-manager.min.css" rel="stylesheet">
 <script src="https://unpkg.com/grapesjs"></script>
-<script src="https://unpkg.com/grapesjs-template-manager"></script>
+<script src="https://unpkg.com/grapesjs-project-manager"></script>
 
 <div id="gjs"></div>
 ```
@@ -22,47 +24,33 @@ const editor = grapesjs.init({
   container: '#gjs',
   height: '100%',
   fromElement: true,
+  pageManager: true, // This should be set to tru
   storageManager:  {
     type: 'indexeddb',
     // ...
   },
-  plugins: ['grapesjs-template-manager'],
+  plugins: ['grapesjs-project-manager'],
 });
 
 // Running commands from panels
 const pn = editor.Panels;
-const panelOpts = pn.addPanel({
-  id: 'options'
+pn.addButton('options', {
+    id: 'open-templates',
+    className: 'fa fa-folder-o',
+    attributes: {
+        title: 'Open projects and templates'
+    },
+    command: 'open-templates', //Open modal 
 });
-panelOpts.get('buttons').add([{
-  attributes: {
-    title: 'Open Templates'
-  },
-  className: 'fa fa-file-o',
-  command: 'open-templates',//Open modal 
-  id: 'open-templates'
-}, {
-  attributes: {
-    title: 'Save As Template'
-  },
-  className: 'fa fa-archive',
-  command: 'save-as-template',//Save page as template
-  id: 'save-as-template'
-}, {
-  attributes: {
-    title: 'Delete Template'
-  },
-  className: 'fa fa-trash-o',
-  command: 'delete-template',//Delete open page or template
-  id: 'delete-templates'
-}, {
-  attributes: {
-    title: 'Take Screenshot'
-  },
-  className: 'fa fa-camera',
-  command: 'take-screenshot',//Take an image of the canvas
-  id: 'take-screenshot'
-}]);
+pn.addButton('views', {
+    id: 'open-pages',
+    className: 'fa fa-file-o',
+    attributes: {
+        title: 'Take Screenshot'
+    },
+    command: 'open-pages',
+    togglable: false
+});
 ```
 
 ### CSS
@@ -76,9 +64,11 @@ body, html {
 
 ## Summary
 
-* Plugin name: `grapesjs-template-manager`
+* Plugin name: `grapesjs-project-manager`
 * Commands
     * `open-templates`
+    * `open-pages`
+    * `open-settings`
     * `get-uuidv4`
     * `take-screenshot`
     * `save-as-template`
@@ -88,8 +78,6 @@ body, html {
     * `firestore`
     * `rest-api`
 
-> This plugin uses the [`<foreignObject>`](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/foreignObject) [SVG](https://developer.mozilla.org/en-US/docs/Web/SVG) element to simulate thumbnails which works well for projects which do not use any external stylesheets such as bootstrap. If your pages rely on external stylesheets you can store image thumbnails with your pages via the `take-screenshot` command which uses the [dom-to-image](https://github.com/tsayen/dom-to-image) library to generate thumbnails. You can also access this library through `editor.domtoimage`. External images may fail to render due to CORS restrictions.
-
 ## Options
 
 | Option | Description | Default |
@@ -97,12 +85,14 @@ body, html {
 | `dbName` | Database name | `gjs` |
 | `objectStoreName` | Collection name | `templates` |
 | `loadFirst` | Load first template in storage | `true` |
-| `indexeddbVersion` | IndexedDB schema version | `4` |
-| `onDelete` | On successful template deletion | `Function` |
-| `onDeleteError` | On error template deletion | `Function` |
-| `onScreenShotError` | On error capturing screenshot | `Function` |
+| `components` | Default components since `fromElement` is not supported | `undefined` |
+| `style` | Default style since `fromElement` is not supported | `undefined` |
+| `indexeddbVersion` | IndexedDB schema version | `5` |
+| `onDelete` | On successful template deletion | `Function(Check source)` |
+| `onDeleteError` | On error template deletion | `Function(Check source)` |
+| `onScreenShotError` | On error capturing screenshot | `Function(Check source)` |
 | `quality` | Generated screenshot quality | `.01` |
-| `mdlTitle` | Template modal title | `Template Manager` |
+| `mdlTitle` | Modal title | `Project Manager` |
 | `apiKey` | `Firebase` API key | `` |
 | `authDomain` | `Firebase` Auth domain | `` |
 | `projectId` | `Cloud Firestore` project ID | `` |
@@ -123,12 +113,13 @@ body, html {
 window.editor = grapesjs.init({
   container: '#gjs',
   // ...
+  pageManager: true,
   storageManager:  {
     type: 'indexeddb'
   },
-  plugins: ['grapesjs-template-manager'],
+  plugins: ['grapesjs-project-manager'],
   pluginsOpts: {
-    'grapesjs-template-manager': { /* Options */ }
+    'grapesjs-project-manager': { /* Options */ }
   }
 });
 ```
@@ -152,12 +143,13 @@ Add credentials:
 window.editor = grapesjs.init({
   container: '#gjs',
   // ...
+  pageManager: true,
   storageManager:  {
     type: 'firestore'
   },
-  plugins: ['grapesjs-template-manager'],
+  plugins: ['grapesjs-project-manager'],
   pluginsOpts: {
-    'grapesjs-template-manager': { 
+    'grapesjs-project-manager': { 
       // Firebase API key
       apiKey: 'FIREBASE_API_KEY',
       // Firebase Auth domain
@@ -177,6 +169,7 @@ Example backend https://github.com/Ju99ernaut/gjs-api
 window.editor = grapesjs.init({
   container: '#gjs',
   // ...
+  pageManager: true,
   storageManager:  {
     type: 'rest-api',
     // the URIs below can be the same depending on your API design 
@@ -186,9 +179,9 @@ window.editor = grapesjs.init({
     params: { _some_token: '...' },
     headers: { Authorization: 'Basic ...' }
   },
-  plugins: ['grapesjs-template-manager'],
+  plugins: ['grapesjs-project-manager'],
   pluginsOpts: {
-    'grapesjs-template-manager': { /* options */ }
+    'grapesjs-project-manager': { /* options */ }
   }
 });
 ```
@@ -196,9 +189,9 @@ window.editor = grapesjs.init({
 ## Download
 
 * CDN
-  * `https://unpkg.com/grapesjs-template-manager`
+  * `https://unpkg.com/grapesjs-project-manager`
 * NPM
-  * `npm i grapesjs-template-manager`
+  * `npm i grapesjs-project-manager`
 * GIT
   * `git clone https://github.com/Ju99ernaut/grapesjs-template-manager.git`
 
@@ -209,9 +202,9 @@ window.editor = grapesjs.init({
 Directly in the browser
 ```html
 <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet"/>
-<link href="https://unpkg.com/grapesjs-template-manager/dist/grapesjs-template-manager.min.css" rel="stylesheet">
+<link href="https://unpkg.com/grapesjs-project-manager/dist/grapesjs-project-manager.min.css" rel="stylesheet">
 <script src="https://unpkg.com/grapesjs"></script>
-<script src="path/to/grapesjs-template-manager.min.js"></script>
+<script src="path/to/grapesjs-project-manager.min.js"></script>
 
 <div id="gjs"></div>
 
@@ -219,13 +212,14 @@ Directly in the browser
   var editor = grapesjs.init({
       container: '#gjs',
       // ...
+      pageManager: true,
       storageManager:  {
         type: 'indexeddb',
         // ...
       },
-      plugins: ['grapesjs-template-manager'],
+      plugins: ['grapesjs-project-manager'],
       pluginsOpts: {
-        'grapesjs-template-manager': { /* options */ }
+        'grapesjs-project-manager': { /* options */ }
       }
   });
 </script>
@@ -234,13 +228,14 @@ Directly in the browser
 Modern javascript
 ```js
 import grapesjs from 'grapesjs';
-import plugin from 'grapesjs-template-manager';
+import plugin from 'grapesjs-project-manager';
 import 'grapesjs/dist/css/grapes.min.css';
-import 'grapesjs-template-manager/dist/grapesjs-template-manager.min.css';
+import 'grapesjs-project-manager/dist/grapesjs-project-manager.min.css';
 
 const editor = grapesjs.init({
   container : '#gjs',
   // ...
+  pageManager: true,
   storageManager:  {
     type: 'indexeddb',
     // ...
