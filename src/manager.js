@@ -92,9 +92,10 @@ export default class TemplateManager extends UI {
     handleOpen(e) {
         const { editor, cs } = this;
         const { projectId } = this.state;
-        if (!projectId) return;
+        if (!projectId || projectId === cs.currentId) return;
         cs.setId(projectId);
         editor.load(res => {
+            cs.setName(res.name);
             cs.setThumbnail(res.thumbnail || '');
             cs.setIsTemplate(res.template);
             cs.setDescription(res.description || 'No description');
@@ -105,8 +106,8 @@ export default class TemplateManager extends UI {
     handleCreate(e) {
         const { editor, cs } = this;
         const { projectId, nameText } = this.state;
-        const id = editor.runCommand('get-uuidv4').substr(0, 7);
-        let name = nameText || id;
+        const id = editor.runCommand('get-uuidv4');
+        const name = nameText || 'New-' + id.substr(0, 8);
         if (!projectId) {
             cs.store({
                 id,
@@ -134,8 +135,8 @@ export default class TemplateManager extends UI {
             cs.setId(projectId);
             cs.setIsTemplate(false);
             editor.load(res => {
-                cs.setId(res.id);
-                cs.setName(res.name);
+                cs.setId(id);
+                cs.setName(name);
                 cs.setThumbnail(res.thumbnail || '');
                 cs.setDescription(res.description || 'No description');
                 editor.Modal.close();
@@ -155,17 +156,16 @@ export default class TemplateManager extends UI {
     }
 
     handleEdit(data) {
-        const { cs } = this;
-        cs.update({ ...data, updated_at: Date() });
-        cs.loadAll(sites => setState({ sites }),
-            err => console.log("Error", err));
+        this.cs.update({ ...data, updated_at: Date() });
     }
 
     handleDelete(e) {
-        const { cs, opts } = this;
-        cs.delete(opts.onDelete, opts.onDeleteError, e.currentTarget.dataset.id);
-        cs.loadAll(sites => setState({ sites }),
-            err => console.log("Error", err));
+        const { cs, setState, opts } = this;
+        cs.delete(res => {
+            opts.onDelete(res);
+            cs.loadAll(sites => setState({ sites }),
+                err => console.log("Error", err));
+        }, opts.onDeleteError, e.currentTarget.dataset.id);
     }
 
     renderSiteList() {
@@ -216,10 +216,11 @@ export default class TemplateManager extends UI {
                     created_at,
                     updated_at
                 } = site;
+                const pages = JSON.parse(site[`${this.id}pages`]);
                 const time = updated_at ? ago(new Date(updated_at).getTime()) : 'NA';
                 const createdAt = created_at ? ago(new Date(created_at).getTime()) : 'NA';
-                const pageNames = '';//pages.map(page => page.n).join(', ');
-                return `<div class="site-wrapper" key="${i}" data-id="${id}" title="Select to open site">
+                const pageNames = pages.map(page => page.name).join(', ');
+                return `<div class="site-wrapper ${cs.currentId === id ? 'open' : ''}" key="${i}" data-id="${id}" title="Select to open site">
                         <div class="site-screenshot">
                             <img src="${thumbnail}" alt="" />
                         </div>
@@ -234,7 +235,7 @@ export default class TemplateManager extends UI {
                         <div class="site-update-time">${time}</div>
                         <div class="site-pages">
                             <div title="${pageNames || id}">
-                                ${site.page?.length || 1}
+                                ${pages.length || 1}
                             </div>
                         </div>
                         <div class="site-create-time">${createdAt}</div>
@@ -263,6 +264,19 @@ export default class TemplateManager extends UI {
             `<div class="${this.pfx}tip-about ${this.pfx}four-color">${this.opts.help}</div>
             <div  class="flex-row"><input class="name tm-input" placeholder="Enter new page name"/>
             <button id="create" class="primary-button">Create</button></div>`;
+    }
+
+    renderThumbnail(thumbnail, page) {
+        const def = `<img src="${thumbnail}" alt="" />`;
+        if (thumbnail) return def;
+        else if (page.html) return `<svg xmlns="http://www.w3.org/2000/svg" class="template-preview" viewBox="0 0 1300 1100" width="99%" height="220">
+                <foreignObject width="100%" height="100%" style="pointer-events:none">
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        ${page.html + '<style scoped>' + page.css + '</style>'}
+                    </div>
+                </foreignObject>
+            </svg>`;
+        return def;
     }
 
     update() {
@@ -295,6 +309,7 @@ export default class TemplateManager extends UI {
 
     render() {
         const { $, pfx, opts } = this;
+        const { tab } = this.state
 
         // Do stuff on render
         this.onRender();
@@ -304,8 +319,8 @@ export default class TemplateManager extends UI {
         const cont = $(`<div class="app">
                 <div class="contents">
                     <div class="${pfx}tab">
-                        <button id="pages" class="${pfx}tablinks active">${opts.tabsText.pages}</button>
-                        <button id="templates" class="${pfx}tablinks">${opts.tabsText.templates}</button>
+                        <button id="pages" class="${pfx}tablinks ${tab === 'pages' ? 'active' : ''}">${opts.tabsText.pages}</button>
+                        <button id="templates" class="${pfx}tablinks ${tab === 'templates' ? 'active' : ''}"">${opts.tabsText.templates}</button>
                     </div>
                     <div id="tm-actions">
                         ${this.renderSiteActions()}
@@ -492,7 +507,7 @@ export class PagesApp extends UI {
                 <div  class="flex-row">
                     <input class="tm-input sm" type="text" placeholder="page name" />
                 </div>
-                <div class="add-page">New Page</div>
+                <div class="add-page">New Page +</div>
             </div>`);
         cont.find('.add-page').on('click', this.addPage);
         cont.find('input').on('change', this.handleNameInput);
@@ -536,7 +551,6 @@ export class SettingsApp extends UI {
 
     update() {
         this.$el?.find('#settings').html(this.renderSettings());
-        this.$el?.find('#save').on('click', this.handleSave);
         this.$el?.find('#generate').on('click', this.handleThumbnail);
     }
 
@@ -563,7 +577,7 @@ export class SettingsApp extends UI {
             const thumbnail = $el?.find('input.thumbnail').val().trim();
             const name = $el?.find('input.name').val().trim();
             const description = $el?.find('input.desc').val().trim();
-            const template = !!$el?.find('input.template').val();
+            const template = $el?.find('input.template').get(0).checked;
             id && editor.TemplateManager.handleEdit({ id, thumbnail, name, description, template });
         }
         editor.Modal.close();
@@ -574,7 +588,7 @@ export class SettingsApp extends UI {
         editor.runCommand('take-screenshot', {
             clb(dataUrl) {
                 $el?.find('input.thumbnail').val(dataUrl);
-                $el?.find('img').setAttr('src', dataUrl);
+                $el?.find('img').attr('src', dataUrl);
             }
         })
     }
@@ -636,7 +650,8 @@ export class SettingsApp extends UI {
                     <button id="save" class="primary-button">Save</button>
                 </div>
             </div>`);
-        cont.find('#page, #project').on('click', this.handleTabs);
+        cont.find('#save').on('click', this.handleSave);
+        cont.find('#generate').on('click', this.handleThumbnail);
 
         this.$el = cont;
         return cont;
