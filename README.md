@@ -2,11 +2,11 @@
 
 > Requires GrapesJS v0.17.3 or higher.
 
-Project, template and page manager for grapesjs. This version makes use of the [`PageManager`](#), the previous version which doesn't make use of the `PageManager` can be found [here](#).
+Project, template and page manager for grapesjs. This version makes use of the [`PageManager`](https://github.com/artf/grapesjs/pull/3411) and has different plugin and package name, the previous version which doesn't make use of the `PageManager` can be found [here](https://github.com/Ju99ernaut/grapesjs-template-manager/tree/template-manager).
 
 | Project | Project settings | Pages | Page settings |
-|---------|------------------|-------|---------------|\
-| | | | |
+|---------|------------------|-------|---------------|
+| ![Screenshot (224)](https://user-images.githubusercontent.com/48953676/130074718-0e50d99a-d004-41e0-890c-66f05175e45c.png) | ![Screenshot (226)](https://user-images.githubusercontent.com/48953676/130074800-075eab50-3059-493d-afa7-0b9f8af9fdf6.png) | ![Screenshot (225)](https://user-images.githubusercontent.com/48953676/130074843-81c120f9-37a0-4ee1-b8d4-019a16de6a46.png) | ![Screenshot (227)](https://user-images.githubusercontent.com/48953676/130074992-12a1774a-0a85-4e4f-8a14-1c95e0a7a7b6.png) |
 
 ### HTML
 ```html
@@ -24,7 +24,7 @@ const editor = grapesjs.init({
   container: '#gjs',
   height: '100%',
   fromElement: true,
-  pageManager: true, // This should be set to tru
+  pageManager: true, // This should be set to true
   storageManager:  {
     type: 'indexeddb',
     // ...
@@ -93,9 +93,9 @@ body, html {
 | `onScreenShotError` | On error capturing screenshot | `Function(Check source)` |
 | `quality` | Generated screenshot quality | `.01` |
 | `mdlTitle` | Modal title | `Project Manager` |
-| `apiKey` | `Firebase` API key | `` |
-| `authDomain` | `Firebase` Auth domain | `` |
-| `projectId` | `Cloud Firestore` project ID | `` |
+| `apiKey` | `Firebase` API key | ` ` |
+| `authDomain` | `Firebase` Auth domain | ` ` |
+| `projectId` | `Cloud Firestore` project ID | ` ` |
 | `firebaseConfig` | Extra firebase app credentials | `{}` |
 | `enableOffline` | Enable `Firestore` support for offline data persistence | `true` |
 | `settings` | `Firestore` database settings | `{ timestampsInSnapshots: true }` |
