@@ -43,26 +43,14 @@
             }
         });
         const pn = editor.Panels;
-        const panelOpts = pn.addPanel({
-            id: 'options'
-        });
-        panelOpts.get('buttons').add([{
-                attributes: {
-                    title: 'Open Templates'
-                },
-                className: 'fa fa-folder-o',
-                command: 'open-templates', //Open modal 
-                id: 'open-templates'
+        pn.addButton('options', {
+            id: 'open-templates',
+            className: 'fa fa-folder-o',
+            attributes: {
+                title: 'Open Templates'
             },
-            {
-                attributes: {
-                    title: 'Save As Template'
-                },
-                className: 'fa fa-clipboard',
-                command: 'save-as-template', //Save page as template
-                id: 'save-as-template'
-            }
-        ]);
+            command: 'open-templates', //Open modal 
+        });
         pn.addButton('views', {
             id: 'open-pages',
             className: 'fa fa-file-o',
