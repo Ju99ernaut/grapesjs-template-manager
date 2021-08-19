@@ -2,8 +2,50 @@ import domtoimage from 'dom-to-image';
 
 export default (editor, opts = {}) => {
     const cm = editor.Commands;
+    const cs = editor.Storage.getCurrentStorage();
+    const mdl = editor.Modal;
+    const pfx = editor.getConfig('stylePrefix');
+    const mdlClass = `${pfx}mdl-dialog-tml`;
+    const mdlClassMd = `${pfx}mdl-dialog-md`;
 
     editor.domtoimage = domtoimage;
+
+    cm.add('open-templates', {
+        run(editor, sender) {
+            const mdlDialog = document.querySelector(`.${pfx}mdl-dialog`);
+            mdlDialog.classList.add(mdlClass);
+            sender?.set && sender.set('active');
+            mdl.setTitle(opts.mdlTitle);
+            mdl.setContent(editor.TemplateManager.render());
+            mdl.open();
+            mdl.getModel().once('change:open', () => {
+                mdlDialog.classList.remove(mdlClass);
+            });
+        }
+    });
+
+    cm.add('open-settings', {
+        run(editor, sender) {
+            const mdlDialog = document.querySelector(`.${pfx}mdl-dialog`);
+            mdlDialog.classList.add(mdlClassMd);
+            sender?.set && sender.set('active');
+            mdl.setTitle(opts.mdlTitle);
+            mdl.setContent(editor.SettingsApp.render());
+            mdl.open();
+            mdl.getModel().once('change:open', () => {
+                mdlDialog.classList.remove(mdlClassMd);
+            });
+        }
+    });
+
+    cm.add('open-pages', {
+        run(editor) {
+            editor.PagesApp.showPanel();
+        },
+        stop(editor) {
+            editor.PagesApp.hidePanel();
+        }
+    })
 
     //some magic from gist.github.com/jed/982883
     const uuidv4 = () => ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
@@ -18,9 +60,8 @@ export default (editor, opts = {}) => {
 
     cm.add('get-uuidv4', () => uuidv4());
 
-    cm.add('take-screenshot', editor => {
+    cm.add('take-screenshot', (editor, s, options = { clb(d) { return d } }) => {
         const el = editor.getWrapper().getEl();
-        const clb = dataUrl => editor.Storage.getCurrentStorage().setThumbnail(dataUrl);
         getJpeg(el, {
             quality: opts.quality,
             height: 1000,
@@ -29,17 +70,15 @@ export default (editor, opts = {}) => {
                 'background-color': 'white',
                 ...editor.getWrapper().getStyle()
             },
-        }, clb, opts.onScreenshotError);
+        }, options.clb, opts.onScreenshotError);
     });
 
     cm.add('save-as-template', editor => {
-        editor.Storage.getCurrentStorage()
-            .setIsTemplate(true);
+        cs.setIsTemplate(true);
         editor.store();
     });
 
     cm.add('delete-template', editor => {
-        editor.Storage.getCurrentStorage()
-            .delete(opts.onDelete, opts.onDeleteError);
+        cs.delete(opts.onDelete, opts.onDeleteError);
     });
 }

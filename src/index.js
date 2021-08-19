@@ -1,6 +1,6 @@
+import TemplateManager, { PagesApp, SettingsApp } from './manager';
 import commands from './commands';
 import storage from './storage';
-import modal from './modal';
 
 export default (editor, opts = {}) => {
     const options = {
@@ -10,7 +10,7 @@ export default (editor, opts = {}) => {
             dbName: 'gjs',
 
             // Collection name
-            objectStoreName: 'templates',
+            objectStoreName: 'projects',
 
             // Load first template in storage
             loadFirst: true,
@@ -19,7 +19,7 @@ export default (editor, opts = {}) => {
             uuidInPath: true,
 
             // Indexeddb version schema
-            indexeddbVersion: 4,
+            indexeddbVersion: 5,
 
             // When template or page is deleted
             onDelete(res) {
@@ -40,30 +40,19 @@ export default (editor, opts = {}) => {
             quality: .01,
 
             // Content for templates modal title
-            mdlTitle: 'Template Manager',
-
-            // Content for button text
-            btnText: {
-                new: 'New Page',
-                edit: 'Edit Selected',
-                create: 'Create',
-                createBlank: 'Create Blank Template'
-            },
+            mdlTitle: 'Project Manager',
 
             // Content for tabs
             tabsText: {
-                pages: 'Pages',
+                pages: 'All',
                 templates: 'Templates'
             },
 
-            // Content for label
-            nameLabel: 'Name',
-
             // Content for help message
-            help: 'Select a template, enter page name, then click create. Use edit to modify the template.',
+            help: 'Select a template, enter project name, then click create. If no template is selected a blank project will be created.',
 
             // Show when no pages yet pages
-            nopages: '<div style="display:flex;align-items:center;padding:50px;margin:auto;">No Pages Yet</div>',
+            nopages: '<div style="display:flex;align-items:center;padding:50px;margin:auto;">No Projects Yet</div>',
 
             // Firebase API key
             apiKey: '',
@@ -86,14 +75,16 @@ export default (editor, opts = {}) => {
         ...opts
     };
 
+    // Init and add dashboard object to editor
+    editor.TemplateManager = new TemplateManager(editor, options);
+    editor.PagesApp = new PagesApp(editor, options);
+    editor.SettingsApp = new SettingsApp(editor, options);
+
     // Load commands
     commands(editor, options);
 
     // Load storages
     storage(editor, options);
-
-    // Load page manager
-    modal(editor, options);
 
     // Load page with index zero
     editor.on('load', () => {
@@ -102,12 +93,15 @@ export default (editor, opts = {}) => {
             const firstPage = res[0];
             if (firstPage && options.loadFirst) {
                 cs.setId(firstPage.id);
-                cs.setIdx(firstPage.idx);
+                cs.setName(firstPage.name);
                 cs.setThumbnail(firstPage.thumbnail);
                 cs.setIsTemplate(firstPage.template);
                 editor.load();
             } else {
-                cs.setIdx(editor.runCommand('get-uuidv4'));
+                cs.setId(editor.runCommand('get-uuidv4'));
+                cs.setName(`Default-${cs.currentId.substr(0, 7)}`);
+                options.components && editor.setComponents(options.components);
+                options.style && editor.setStyle(options.style);
             }
         });
     });
