@@ -83,7 +83,10 @@ export default (editor, opts = {}) => {
         load(keys, clb, clbError) {
             getAsyncDoc(doc => {
                 doc.get()
-                    .then(doc => doc.exists && clb(doc.data()))
+                    .then(doc => {
+                        if (doc.exists) clb(doc.data());
+                        else clb({});
+                    })
                     .catch(clbError);
             });
         },
@@ -102,7 +105,7 @@ export default (editor, opts = {}) => {
 
         store(data, clb, clbError) {
             getAsyncCollection(cll => {
-                cll.doc(data.idx || this.currentIdx).set({
+                cll.doc(data.id || this.currentId).set({
                     id: this.currentId,
                     name: this.currentName,
                     template: this.isTemplate,
