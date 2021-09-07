@@ -108,20 +108,20 @@ export default class TemplateManager extends UI {
         const { projectId, nameText } = this.state;
         const id = editor.runCommand('get-uuidv4');
         const name = nameText || 'New-' + id.substr(0, 8);
+        const def = {
+            id,
+            name,
+            template: false,
+            thumbnail: '',
+            styles: '[]',
+            description: 'No description',
+        };
+        def[`${this.id}pages`] = '[{"name": "index"}]';
+        def[`${this.id}styles`] = '[]';
+        def[`${this.id}assets`] = '[]';
         if (!projectId) {
-            cs.store({
-                id,
-                name,
-                template: false,
-                thumbnail: '',
-                styles: '',
-                description: 'No description',
-                pages: [{
-                    name: 'index',
-                    component: ''
-                }]
-            }, res => {
-                cs.setId(id);
+            cs.setId(id);
+            cs.store(def, res => {
                 cs.setIsTemplate(false);
                 editor.load(res => {
                     cs.setId(res.id);
