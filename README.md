@@ -190,6 +190,84 @@ window.editor = grapesjs.init({
 });
 ```
 
+The backend schema can be something like:
+
+`GET` `https://api/templates/` load all templates
+
+Returns
+```json
+[
+    {
+      "id": "UUIDv4",
+      "name": "Page name",
+      "template": false,
+      "thumbnail": "",
+      "description": "No description",
+      "gjs-assets": "[]",
+      "gjs-pages": "[]",
+      "gjs-styles": "[]",
+      "updated_at": ""
+    }
+]
+```
+
+`POST` `https://api/templates/{idx: UUIDv4}` store template
+
+Expects
+```json
+{
+  "id": "UUIDv4",
+  "name": "Page name",
+  "template": false,
+  "thumbnail": "",
+  "description": "No description",
+  "gjs-assets": "[]",
+  "gjs-pages": "[]",
+  "gjs-styles": "[]",
+  "updated_at": ""
+}
+```
+
+`GET` `https://api/templates/{idx: UUIDv4}` load template
+
+Returns
+```json
+{
+  "id": "UUIDv4",
+  "name": "Page name",
+  "template": false,
+  "thumbnail": "",
+  "description": "No description",
+  "gjs-assets": "[]",
+  "gjs-pages": "[]",
+  "gjs-styles": "[]",
+  "updated_at": ""
+}
+```
+
+`DELETE` `https://api/templates/{idx: UUIDv4}` delete template
+
+Which would have the following setup:
+```js
+window.editor = grapesjs.init({
+  container: '#gjs',
+  // ...
+  storageManager:  {
+    type: 'rest-api',
+    // the URIs below can be the same depending on your API design 
+    urlStore: 'https://api/templates/',// POST
+    urlLoad: 'https://api/templates/',// GET
+    urlDelete: 'https://api/templates/',// DELETE
+  },
+  plugins: ['grapesjs-template-manager'],
+  pluginsOpts: {
+    'grapesjs-template-manager': { /* options */ }
+  }
+});
+```
+
+All the fields are generated from the editor so you just need to setup your API to receive and return data in that format. I'd recommend you check the network tab so you get a more accurate format for the payloads.
+
 ## Download
 
 * CDN
