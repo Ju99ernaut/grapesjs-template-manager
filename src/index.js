@@ -74,6 +74,11 @@ export default (editor, opts = {}) => {
 
             // Show estimated project statistics
             size: false,
+
+            // Send feedback when open is clicked on current page
+            currentPageOpen() {
+                console.log('Current page already open')
+            }
         },
         ...opts
     };

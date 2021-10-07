@@ -97,7 +97,10 @@ export default class TemplateManager extends UI {
     handleOpen(e) {
         const { editor, cs } = this;
         const { projectId } = this.state;
-        if (!projectId || projectId === cs.currentId) return;
+        if (!projectId || projectId === cs.currentId) {
+            this.opts.currentPageOpen()
+            return;
+        }
         cs.setId(projectId);
         editor.load(res => {
             cs.setName(res.name);
