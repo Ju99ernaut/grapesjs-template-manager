@@ -132,6 +132,8 @@ window.editor = grapesjs.init({
 
 ## Firestore
 
+> Tested on firebase v8+. Firebase v9+ not yet supported.
+
 Configure firestore access rules for your app.
 Add libraries to `head` of document:
 
