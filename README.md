@@ -104,6 +104,7 @@ body, html {
 | `enableOffline` | Enable `Firestore` support for offline data persistence | `true` |
 | `settings` | `Firestore` database settings | `{ timestampsInSnapshots: true }` |
 | `uuidInPath` | Add uuid as path parameter on store for `rest-api`(useful for validation) | `true` |
+| `size` | Display estimated project sizes | `true` |
 
 * Setting `loadFirst` to `false` prevents overwritting the contents of the editor with the contents of the first template in storage.
 * Only use options for `Firebase` when using `Cloud Firestore` storage.

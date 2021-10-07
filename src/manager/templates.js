@@ -1,5 +1,6 @@
 import ago from '../utils/timeago';
 import UI from '../utils/ui';
+import objSize from '../utils/objsize';
 import { sortByDate, sortByName, matchText } from '../utils/sort';
 
 export default class TemplateManager extends UI {
@@ -33,6 +34,10 @@ export default class TemplateManager extends UI {
 
     get allSites() {
         return this.state.sites;
+    }
+
+    get allSitesSize() {
+        return objSize(this.state.sites);
     }
 
     onRender() {
@@ -216,6 +221,7 @@ export default class TemplateManager extends UI {
                     created_at,
                     updated_at
                 } = site;
+                const size = objSize(site);
                 const pages = JSON.parse(site[`${this.id}pages`]);
                 const time = updated_at ? ago(new Date(updated_at).getTime()) : 'NA';
                 const createdAt = created_at ? ago(new Date(created_at).getTime()) : 'NA';
@@ -239,6 +245,9 @@ export default class TemplateManager extends UI {
                             </div>
                         </div>
                         <div class="site-create-time">${createdAt}</div>
+                        ${opts.size ? `<div class="site-size" title="${size} KB">
+                            ${size.toFixed(2)} KB
+                        </div>` : ''}
                         <div class="site-actions">
                             <i class="${pfx}caret-icon fa fa-hand-pointer-o edit" title="edit" data-id="${id}"></i>
                             ${!(cs.currentId === id) ? `<i class="${pfx}caret-icon fa fa-trash-o delete" title="delete" data-id="${id}"></i>` : ''}
@@ -358,6 +367,13 @@ export default class TemplateManager extends UI {
                         >
                             Created At
                         </div>
+                        ${opts.size ? `<div
+                            class="site-size header"
+                            data-sort="id"
+                            title="Click to sort by site size"
+                        >
+                            Size
+                        </div>` : ''}
                         <div
                             class="site-actions header"
                             data-sort="id"

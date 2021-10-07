@@ -71,6 +71,9 @@ export default (editor, opts = {}) => {
 
             // Database settings (https://firebase.google.com/docs/reference/js/firebase.firestore.Settings)
             settings: { timestampsInSnapshots: true },
+
+            // Show estimated project statistics
+            size: false,
         },
         ...opts
     };
