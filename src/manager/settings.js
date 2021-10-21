@@ -77,35 +77,67 @@ export default class SettingsApp extends UI {
         if (tab === 'page') {
             const page = pm.get(editor.PagesApp.editableId);
             const value = page?.get('name') || page?.id || '';
-            return `<label for="name">Name</label>
+            return `<label for="name">
+                    ${editor.I18n.t('grapesjs-project-manager.settings.labels.name')}
+                </label>
                 <div class="flex-row">
-                    <input class="name tm-input" value="${value}" placeholder="Current page name"/>
+                    <input 
+                        class="name tm-input" 
+                        value="${value}" 
+                        placeholder="${editor.I18n.t('grapesjs-project-manager.settings.placeholders.name')}"/>
                 </div>`
         } else {
             const clb = site => site.id === editor.TemplateManager.editableId;
             const site = editor.TemplateManager.allSites.find(clb);
-            return `<div class="${pfx}tip-about ${pfx}four-color">Enter url, or generate thumbnail.</div>
-                <label for="thumbnail">Thumbnail</label>
+            return `<div class="${pfx}tip-about ${pfx}four-color">
+                    ${editor.I18n.t('grapesjs-project-manager.settings.help')}
+                </div>
+                <label for="thumbnail">
+                    ${editor.I18n.t('grapesjs-project-manager.settings.labels.thumbnail')}
+                </label>
                 <div class="flex-row">
-                    <input id="thumbnail" class="thumbnail tm-input" value="${site?.thumbnail || ''}" placeholder="Project thumbnail"/>
+                    <input 
+                        id="thumbnail" 
+                        class="thumbnail tm-input" 
+                        value="${site?.thumbnail || ''}" 
+                        placeholder="${editor.I18n.t('grapesjs-project-manager.settings.placeholders.thumbnail')}"
+                    />
                 </div>
                 <div class="flex-row" style="margin-bottom:15px;">
                     <div class="site-screenshot">
                         <img src="${site?.thumbnail || ''}" alt="screenshot" />
                     </div>
-                    <button id="generate" class="primary-button">Generate</button>
+                    <button id="generate" class="primary-button">
+                        ${editor.I18n.t('grapesjs-project-manager.settings.generate')}
+                    </button>
                 </div>
-                <label for="name">Name</label>
+                <label for="name">
+                    ${editor.I18n.t('grapesjs-project-manager.settings.labels.name')}
+                </label>
                 <div class="flex-row">
-                    <input id="name" class="name tm-input" value="${site?.name || ''}" placeholder="Project name"/>
+                    <input 
+                        id="name" 
+                        class="name tm-input" 
+                        value="${site?.name || ''}" 
+                        placeholder="${editor.I18n.t('grapesjs-project-manager.settings.placeholders.name')}"
+                    />
                 </div>
-                <label for="desc">Description</label>
+                <label for="desc">
+                    ${editor.I18n.t('grapesjs-project-manager.settings.labels.description')}
+                </label>
                 <div class="flex-row">
-                    <input id="desc" class="desc tm-input" value="${site?.description || ''}" placeholder="Project description"/>
+                    <input 
+                        id="desc" 
+                        class="desc tm-input" 
+                        value="${site?.description || ''}" 
+                        placeholder="${editor.I18n.t('grapesjs-project-manager.settings.placeholders.description')}"
+                    />
                 </div>
                 <div class="flex-row group">
                     <input id="template" class="template" type="checkbox" ${site?.template ? 'checked' : ''}/>
-                    <label for="template">Template</label>
+                    <label for="template">
+                        ${editor.I18n.t('grapesjs-project-manager.settings.labels.template')}
+                    </label>
                 </div>`
         }
     }
@@ -122,7 +154,9 @@ export default class SettingsApp extends UI {
                     ${this.renderSettings()}
                 </div>
                 <div class="flex-row">
-                    <button id="save" class="primary-button">Save</button>
+                    <button id="save" class="primary-button">
+                        ${editor.I18n.t('grapesjs-project-manager.settings.save')}
+                    </button>
                 </div>
             </div>`);
         cont.find('#save').on('click', this.handleSave);

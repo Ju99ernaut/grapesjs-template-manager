@@ -1,6 +1,7 @@
 import TemplateManager, { PagesApp, SettingsApp } from './manager';
 import commands from './commands';
 import storage from './storage';
+import en from './locale/en';
 
 export default (editor, opts = {}) => {
     const options = {
@@ -42,15 +43,6 @@ export default (editor, opts = {}) => {
             // Content for templates modal title
             mdlTitle: 'Project Manager',
 
-            // Content for tabs
-            tabsText: {
-                pages: 'All',
-                templates: 'Templates'
-            },
-
-            // Content for help message
-            help: 'Select a template, enter project name, then click create. If no template is selected a blank project will be created.',
-
             // Show when no pages yet pages
             nopages: '<div style="display:flex;align-items:center;padding:50px;margin:auto;">No Projects Yet</div>',
 
@@ -78,10 +70,17 @@ export default (editor, opts = {}) => {
             // Send feedback when open is clicked on current page
             currentPageOpen() {
                 console.log('Current page already open')
-            }
+            },
+
+            i18n: {},
         },
-        ...opts
+        ...opts,
     };
+
+    editor.I18n.addMessages({
+        en,
+        ...options.i18n,
+    });
 
     // Init and add dashboard object to editor
     editor.TemplateManager = new TemplateManager(editor, options);

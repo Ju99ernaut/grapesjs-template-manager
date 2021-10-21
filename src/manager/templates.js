@@ -1,7 +1,7 @@
 import ago from '../utils/timeago';
 import UI from '../utils/ui';
 import objSize from '../utils/objsize';
-import { sortByDate, sortByName, matchText } from '../utils/sort';
+import { sortByDate, sortByName, sortByPages, sortBySize, matchText } from '../utils/sort';
 
 export default class TemplateManager extends UI {
     constructor(editor, opts = {}) {
@@ -152,7 +152,6 @@ export default class TemplateManager extends UI {
         }
     }
 
-
     openEdit(e) {
         const { editor, setStateSilent } = this;
         setStateSilent({
@@ -189,6 +188,10 @@ export default class TemplateManager extends UI {
             order = sortByName(sortBy, sortOrder);
         } else if (sortBy === 'updated_at' || sortBy === 'created_at') {
             order = sortByDate(sortBy, sortOrder);
+        } else if (sortBy === 'pages') {
+            order = sortByPages(this.id + sortBy, sortOrder);
+        } else if (sortBy === 'size') {
+            order = sortBySize(sortOrder);
         }
 
         const sortedSites = sites.sort(order);
@@ -229,7 +232,11 @@ export default class TemplateManager extends UI {
                 const time = updated_at ? ago(new Date(updated_at).getTime()) : 'NA';
                 const createdAt = created_at ? ago(new Date(created_at).getTime()) : 'NA';
                 const pageNames = pages.map(page => page.name).join(', ');
-                return `<div class="site-wrapper ${cs.currentId === id ? 'open' : ''}" key="${i}" data-id="${id}" title="Select to open site">
+                return `<div 
+                    class="site-wrapper ${cs.currentId === id ? 'open' : ''}" 
+                    key="${i}" 
+                    data-id="${id}" 
+                    title="${editor.I18n.t('grapesjs-project-manager.templates.titles.open')}">
                         <div class="site-screenshot">
                             <img src="${thumbnail}" alt="" />
                         </div>
@@ -252,8 +259,8 @@ export default class TemplateManager extends UI {
                             ${size.toFixed(2)} KB
                         </div>` : ''}
                         <div class="site-actions">
-                            <i class="${pfx}caret-icon fa fa-hand-pointer-o edit" title="edit" data-id="${id}"></i>
-                            ${!(cs.currentId === id) ? `<i class="${pfx}caret-icon fa fa-trash-o delete" title="delete" data-id="${id}"></i>` : ''}
+                            <i class="${pfx}caret-icon fa fa-hand-pointer-o edit" title="${editor.I18n.t('grapesjs-project-manager.templates.titles.edit')}" data-id="${id}"></i>
+                            ${!(cs.currentId === id) ? `<i class="${pfx}caret-icon fa fa-trash-o delete" title="${editor.I18n.t('grapesjs-project-manager.templates.titles.delete')}" data-id="${id}"></i>` : ''}
                         </div>
                     </div>`;
             }).join('\n');
@@ -271,11 +278,27 @@ export default class TemplateManager extends UI {
 
     renderSiteActions() {
         return this.state.tab === 'pages' ?
-            `<div  class="flex-row"><input class="search tm-input" placeholder="Search for sites by name or id"/>
-            <button id="open" class="primary-button">Open</button></div>` :
-            `<div class="${this.pfx}tip-about ${this.pfx}four-color">${this.opts.help}</div>
-            <div  class="flex-row"><input class="name tm-input" placeholder="Enter new page name"/>
-            <button id="create" class="primary-button">Create</button></div>`;
+            `<div  class="flex-row">
+                <input 
+                    class="search tm-input" 
+                    placeholder="${editor.I18n.t('grapesjs-project-manager.templates.search')}"
+                />
+                <button id="open" class="primary-button">
+                    ${editor.I18n.t('grapesjs-project-manager.templates.open')}
+                </button>
+            </div>` :
+            `<div class="${this.pfx}tip-about ${this.pfx}four-color">
+                ${editor.I18n.t('grapesjs-project-manager.templates.help')}
+            </div>
+            <div class="flex-row">
+                <input 
+                    class="name tm-input" 
+                    placeholder="${editor.I18n.t('grapesjs-project-manager.templates.new')}"
+                />
+                <button id="create" class="primary-button">
+                    ${editor.I18n.t('grapesjs-project-manager.templates.create')}
+                </button>
+            </div>`;
     }
 
     renderThumbnail(thumbnail, page) {
@@ -331,8 +354,12 @@ export default class TemplateManager extends UI {
         const cont = $(`<div class="app">
                 <div class="contents">
                     <div class="${pfx}tab">
-                        <button id="pages" class="${pfx}tablinks ${tab === 'pages' ? 'active' : ''}">${opts.tabsText.pages}</button>
-                        <button id="templates" class="${pfx}tablinks ${tab === 'templates' ? 'active' : ''}"">${opts.tabsText.templates}</button>
+                        <button id="pages" class="${pfx}tablinks ${tab === 'pages' ? 'active' : ''}">
+                            ${editor.I18n.t('grapesjs-project-manager.templates.all')}
+                        </button>
+                        <button id="templates" class="${pfx}tablinks ${tab === 'templates' ? 'active' : ''}"">
+                            ${editor.I18n.t('grapesjs-project-manager.templates.templates')}
+                        </button>
                     </div>
                     <div id="tm-actions">
                         ${this.renderSiteActions()}
@@ -341,9 +368,9 @@ export default class TemplateManager extends UI {
                         <div
                             class="site-screenshot-header header"
                             data-sort="id"
-                            title="Click to sort by site name"
+                            title="${editor.I18n.t('grapesjs-project-manager.templates.titles.info')}"
                         >
-                            Site Info
+                            ${editor.I18n.t('grapesjs-project-manager.templates.info')}
                         </div>
                         <div
                             class="site-info header"
@@ -352,37 +379,37 @@ export default class TemplateManager extends UI {
                         <div
                             class="site-update-time header"
                             data-sort="updated_at"
-                            title="Click to sort by last update date"
+                            title="${editor.I18n.t('grapesjs-project-manager.templates.titles.updated')}"
                         >
-                            Last updated
+                            ${editor.I18n.t('grapesjs-project-manager.templates.updated')}
                         </div>
                         <div
                             class="site-pages header"
                             data-sort="pages"
-                            title="Click to sort by number of pages"
+                            title="${editor.I18n.t('grapesjs-project-manager.templates.titles.pages')}"
                         >
-                            Pages
+                            ${editor.I18n.t('grapesjs-project-manager.templates.pages')}
                         </div>
                         <div
                             class="site-create-time header"
                             data-sort="created_at"
-                            title="Click to sort by site creation date"
+                            title="${editor.I18n.t('grapesjs-project-manager.templates.titles.created')}"
                         >
-                            Created At
+                            ${editor.I18n.t('grapesjs-project-manager.templates.created')}
                         </div>
                         ${opts.size ? `<div
                             class="site-size header"
-                            data-sort="id"
-                            title="Click to sort by site size"
+                            data-sort="size"
+                            title="${editor.I18n.t('grapesjs-project-manager.templates.titles.size')}"
                         >
-                            Size
+                            ${editor.I18n.t('grapesjs-project-manager.templates.size')}
                         </div>` : ''}
                         <div
                             class="site-actions header"
                             data-sort="id"
-                            title="Click to sort by site name"
+                            title="${editor.I18n.t('grapesjs-project-manager.templates.titles.actions')}"
                         >
-                            Actions
+                            ${editor.I18n.t('grapesjs-project-manager.templates.actions')}
                         </div>
                     </div>
                     <div id="site-list">

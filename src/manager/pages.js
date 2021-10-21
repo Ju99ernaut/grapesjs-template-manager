@@ -115,7 +115,7 @@ export default class PagesApp extends UI {
     }
 
     render() {
-        const { $ } = this;
+        const { $, editor } = this;
 
         // Do stuff on render
         this.onRender();
@@ -126,9 +126,15 @@ export default class PagesApp extends UI {
                     ${this.renderPagesList()}
                 </div>
                 <div  class="flex-row">
-                    <input class="tm-input sm" type="text" placeholder="page name" />
+                    <input 
+                        class="tm-input sm" 
+                        type="text" 
+                        placeholder="${editor.I18n.t('grapesjs-project-manager.pages.placeholder')}" 
+                    />
                 </div>
-                <div class="add-page">New Page +</div>
+                <div class="add-page">
+                    ${editor.I18n.t('grapesjs-project-manager.pages.new')}
+                </div>
             </div>`);
         cont.find('.add-page').on('click', this.addPage);
         cont.find('input').on('change', this.handleNameInput);
