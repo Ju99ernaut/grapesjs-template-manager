@@ -106,6 +106,7 @@ body, html {
 | `uuidInPath` | Add uuid as path parameter on store for `rest-api`(useful for validation) | `true` |
 | `size` | Display estimated project sizes | `true` |
 | `currentPageOpen` | Send feedback when open is clicked on current page | `check source` |
+| `ì18n` | I18n object containing language [more info](https://grapesjs.com/docs/modules/I18n.html#configuration) | `{}` |
 
 * Setting `loadFirst` to `false` prevents overwritting the contents of the editor with the contents of the first template in storage.
 * Only use options for `Firebase` when using `Cloud Firestore` storage.
@@ -336,8 +337,6 @@ const editor = grapesjs.init({
   ],
 });
 ```
-
-
 
 ## Development
 
