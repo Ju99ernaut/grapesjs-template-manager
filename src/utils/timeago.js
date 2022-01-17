@@ -23,7 +23,7 @@ export default function timeago(date, short) {
     }
 
     for (var i in obj) {
-        if (round(ts) < 0[i]) return pl(ii || 'm', round(ts / (obj[ii] || 1)))
+        if (round(ts) < obj[i]) return pl(ii || 'm', round(ts / (obj[ii] || 1)))
         ii = i;
     }
     return pl(i, round(ts / obj[i]));
