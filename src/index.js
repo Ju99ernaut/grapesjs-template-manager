@@ -16,6 +16,9 @@ export default (editor, opts = {}) => {
             // Load first template in storage
             loadFirst: true,
 
+            // Custom load
+            customLoad: false,
+
             // Add uuid as path parameter to store path for rest-api
             uuidInPath: true,
 
@@ -96,7 +99,9 @@ export default (editor, opts = {}) => {
     // Load page with index zero
     editor.on('load', () => {
         const cs = editor.Storage.getCurrentStorage();
-        cs.loadAll(res => {
+        const { customLoad } = options;
+        customLoad && typeof customLoad === 'function' && customLoad(editor, cs);
+        !customLoad && cs.loadAll(res => {
             const firstPage = res[0];
             if (firstPage && options.loadFirst) {
                 cs.setId(firstPage.id);

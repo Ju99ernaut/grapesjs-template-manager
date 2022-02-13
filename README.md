@@ -89,6 +89,7 @@ body, html {
 | `dbName` | Database name | `gjs` |
 | `objectStoreName` | Collection name | `templates` |
 | `loadFirst` | Load first template in storage | `true` |
+| `customLoad` | Use custom onload function(skips default onload steps), `(ed, cs) => ...` | `false` |
 | `components` | Default components since `fromElement` is not supported | `undefined` |
 | `style` | Default style since `fromElement` is not supported | `undefined` |
 | `indexeddbVersion` | IndexedDB schema version | `5` |
