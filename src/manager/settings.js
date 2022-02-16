@@ -143,7 +143,7 @@ export default class SettingsApp extends UI {
     }
 
     render() {
-        const { $ } = this;
+        const { $, editor } = this;
 
         // Do stuff on render
         this.onRender();

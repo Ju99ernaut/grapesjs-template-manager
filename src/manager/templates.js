@@ -177,7 +177,7 @@ export default class TemplateManager extends UI {
 
     renderSiteList() {
         const { sites, tab, filterText, loading, sortBy, sortOrder } = this.state;
-        const { pfx, opts, cs } = this;
+        const { pfx, opts, cs, editor } = this;
 
         if (loading) return opts.loader || '<div>Loading sites...</div>';
 
@@ -277,6 +277,8 @@ export default class TemplateManager extends UI {
     }
 
     renderSiteActions() {
+        const { editor } = this;
+
         return this.state.tab === 'pages' ?
             `<div  class="flex-row">
                 <input 
@@ -343,7 +345,7 @@ export default class TemplateManager extends UI {
     }
 
     render() {
-        const { $, pfx, opts } = this;
+        const { $, pfx, opts, editor } = this;
         const { tab } = this.state
 
         // Do stuff on render
