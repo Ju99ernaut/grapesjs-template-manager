@@ -124,7 +124,7 @@ export default class TemplateManager extends UI {
             styles: '[]',
             description: 'No description',
         };
-        def[`${this.id}pages`] = '[{"name": "index"}]';
+        def[`${this.id}pages`] = `[{"id": "${crypto.randomUUID().substr(0, 8)}", "name": "index"}]`;
         def[`${this.id}styles`] = '[]';
         def[`${this.id}assets`] = '[]';
         if (!projectId) {
