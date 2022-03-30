@@ -40,7 +40,7 @@ export default class TemplateManager extends UI {
         return objSize(this.state.sites);
     }
 
-    onRender() {
+    async onRender() {
         const { setState, cs } = this;
 
         /* Set request loading state */
@@ -49,14 +49,12 @@ export default class TemplateManager extends UI {
         });
 
         /* Fetch sites from storage API */
-        cs.loadAll(sites => {
-            /* Set sites and turn off loading state */
-            setState({
-                sites,
-                loading: false
-            });
-        },
-            err => console.log("Error", err));
+        const sites = await cs.loadAll();
+        /* Set sites and turn off loading state */
+        setState({
+            sites,
+            loading: false
+        });
     }
 
     handleFilterInput(e) {
@@ -94,7 +92,7 @@ export default class TemplateManager extends UI {
         }
     }
 
-    handleOpen(e) {
+    async handleOpen(e) {
         const { editor, cs } = this;
         const { projectId } = this.state;
         if (!projectId || projectId === cs.currentId) {
@@ -102,16 +100,15 @@ export default class TemplateManager extends UI {
             return;
         }
         cs.setId(projectId);
-        editor.load(res => {
-            cs.setName(res.name);
-            cs.setThumbnail(res.thumbnail || '');
-            cs.setIsTemplate(res.template);
-            cs.setDescription(res.description || 'No description');
-            editor.Modal.close();
-        });
+        const res = await editor.load();
+        cs.setName(res.name);
+        cs.setThumbnail(res.thumbnail || '');
+        cs.setIsTemplate(res.template);
+        cs.setDescription(res.description || 'No description');
+        editor.Modal.close();
     }
 
-    handleCreate(e) {
+    async handleCreate(e) {
         const { editor, cs } = this;
         const { projectId, nameText } = this.state;
         const id = editor.runCommand('get-uuidv4');
@@ -129,26 +126,23 @@ export default class TemplateManager extends UI {
         def[`${this.id}assets`] = '[]';
         if (!projectId) {
             cs.setId(id);
-            cs.store(def, res => {
-                cs.setIsTemplate(false);
-                editor.load(res => {
-                    cs.setId(res.id);
-                    cs.setName(res.name);
-                    cs.setThumbnail(res.thumbnail || '');
-                    cs.setDescription(res.description || 'No description');
-                    editor.Modal.close();
-                });
-            });
+            await cs.store(def);
+            cs.setIsTemplate(false);
+            const res = await editor.load();
+            cs.setId(res.id);
+            cs.setName(res.name);
+            cs.setThumbnail(res.thumbnail || '');
+            cs.setDescription(res.description || 'No description');
+            editor.Modal.close();
         } else {
             cs.setId(projectId);
             cs.setIsTemplate(false);
-            editor.load(res => {
-                cs.setId(id);
-                cs.setName(name);
-                cs.setThumbnail(res.thumbnail || '');
-                cs.setDescription(res.description || 'No description');
-                editor.Modal.close();
-            });
+            const res = await editor.load();
+            cs.setId(id);
+            cs.setName(name);
+            cs.setThumbnail(res.thumbnail || '');
+            cs.setDescription(res.description || 'No description');
+            editor.Modal.close();
         }
     }
 
@@ -166,13 +160,12 @@ export default class TemplateManager extends UI {
         this.cs.update({ ...data, updated_at: Date() });
     }
 
-    handleDelete(e) {
+    async handleDelete(e) {
         const { cs, setState, opts } = this;
-        cs.delete(res => {
-            opts.onDelete(res);
-            cs.loadAll(sites => setState({ sites }),
-                err => console.log("Error", err));
-        }, opts.onDeleteError, e.currentTarget.dataset.id);
+        const res = await cs.delete(e.currentTarget.dataset.id);
+        opts.onDelete(res);
+        const sites = await cs.loadAll();
+        setState({ sites })
     }
 
     renderSiteList() {

@@ -30,11 +30,6 @@ export default (editor, opts = {}) => {
                 console.log('Deleted:', res)
             },
 
-            // When error onDelete
-            onDeleteError(err) {
-                console.log(err)
-            },
-
             // On screenshot error
             onScreenshotError(err) {
                 console.log(err)
@@ -97,11 +92,12 @@ export default (editor, opts = {}) => {
     storage(editor, options);
 
     // Load page with index zero
-    editor.on('load', () => {
+    editor.on('load', async () => {
         const cs = editor.Storage.getCurrentStorage();
         const { customLoad } = options;
         customLoad && typeof customLoad === 'function' && customLoad(editor, cs);
-        !customLoad && cs.loadAll(res => {
+        if (!customLoad) {
+            const res = await cs.loadAll();
             const firstPage = res[0];
             if (firstPage && options.loadFirst) {
                 cs.setId(firstPage.id);
@@ -112,9 +108,7 @@ export default (editor, opts = {}) => {
             } else {
                 cs.setId(editor.runCommand('get-uuidv4'));
                 cs.setName(`Default-${cs.currentId.substr(0, 7)}`);
-                options.components && editor.setComponents(options.components);
-                options.style && editor.setStyle(options.style);
             }
-        });
+        }
     });
 };
