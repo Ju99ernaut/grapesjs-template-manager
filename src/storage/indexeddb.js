@@ -8,9 +8,9 @@ export default (editor, opts = {}) => {
 
     // Functions for DB retrieving
     const getDb = () => db;
-    const getAsyncDb = (clb) => {
+    const getAsyncDb = () => {
         if (db) {
-            clb(db);
+            return db;
         } else {
             const indexedDB = window.indexedDB || window.mozIndexedDB ||
                 window.webkitIndexedDB || window.msIndexedDB;
@@ -20,12 +20,12 @@ export default (editor, opts = {}) => {
             request.onsuccess = () => {
                 db = request.result;
                 db.onerror = onError;
-                clb(db);
             };
             request.onupgradeneeded = e => {
                 const objs = e.currentTarget.result.createObjectStore(objsName, { keyPath: 'id' });
                 objs.createIndex('name', 'name', { unique: false });
             };
+            return db;
         }
     };
 
@@ -33,11 +33,12 @@ export default (editor, opts = {}) => {
     const getObjectStore = () => {
         return db.transaction([objsName], 'readwrite').objectStore(objsName);
     };
-    const getAsyncObjectStore = clb => {
+    const getAsyncObjectStore = () => {
         if (db) {
-            clb(getObjectStore());
+            return getObjectStore();
         } else {
-            getAsyncDb(db => clb(getObjectStore()))
+            getAsyncDb();
+            return getObjectStore();
         }
     };
 
@@ -72,60 +73,79 @@ export default (editor, opts = {}) => {
             this.description = description;
         },
 
-        load(keys, clb, clbErr) {
-            getAsyncObjectStore(objs => {
-                const request = objs.get(this.currentId);
-                request.onerror = clbErr;
-                request.onsuccess = () => {
-                    clb && clb(request.result);
-                };
-            });
+        async load(keys) {
+            return new Promise(
+                function (resolve, reject) {
+                    const objs = getAsyncObjectStore();
+                    const request = objs.get(this.currentId);
+                    request.onerror = () => reject(Error('Load error'));
+                    request.onsuccess = () => {
+                        resolve(request.result);
+                    };
+                }
+            );
         },
 
-        loadAll(clb, clbErr) {
-            getAsyncObjectStore(objs => {
-                const request = objs.getAll();
-                request.onerror = clbErr;
-                request.onsuccess = () => {
-                    clb && clb(request.result);
-                };
-            });
+        async loadAll() {
+            return new Promise(
+                function (resolve, reject) {
+                    const objs = getAsyncObjectStore();
+                    const request = objs.getAll();
+                    request.onerror = () => reject(Error('Load error'));
+                    request.onsuccess = () => {
+                        resolve(request.result);
+                    };
+                }
+            );
         },
 
-        store(data, clb, clbErr) {
-            getAsyncObjectStore(objs => {
-                const request = objs.put({
-                    id: this.currentId,
-                    name: this.currentName,
-                    template: this.isTemplate,
-                    thumbnail: this.currentThumbnail,
-                    description: this.description,
-                    updated_at: Date(),
-                    ...data
-                });
-                request.onerror = clbErr;
-                request.onsuccess = clb;
-            });
+        async store(data) {
+            return new Promise(
+                function (resolve, reject) {
+                    const objs = getAsyncObjectStore();
+                    const request = objs.put({
+                        id: this.currentId,
+                        name: this.currentName,
+                        template: this.isTemplate,
+                        thumbnail: this.currentThumbnail,
+                        description: this.description,
+                        updated_at: Date(),
+                        ...data
+                    });
+                    request.onerror = () => reject(Error('Store error'));
+                    request.onsuccess = () => {
+                        resolve(request.result);
+                    };
+                }
+            );
         },
 
-        update(data, clb, clbErr) {
-            const { id, ..._data } = data;
-            getAsyncObjectStore(objs => {
-                const request = objs.get(id);
-                request.onerror = clbErr;
-                request.onsuccess = () => {
-                    objs.put({ id, ...request.result, ..._data });
-                    clb && clb(request.result);
-                };
-            });
+        async update(data) {
+            return new Promise(
+                function (resolve, reject) {
+                    const { id, ..._data } = data;
+                    const objs = getAsyncObjectStore();
+                    const request = objs.get(id);
+                    request.onerror = () => reject(Error('Update error'));
+                    request.onsuccess = () => {
+                        objs.put({ id, ...request.result, ..._data });
+                        resolve(request.result);
+                    };
+                }
+            );
         },
 
-        delete(clb, clbErr, index) {
-            getAsyncObjectStore(objs => {
-                const request = objs.delete(index || this.currentId);
-                request.onerror = clbErr;
-                request.onsuccess = clb;
-            });
+        async delete(index) {
+            return new Promise(
+                function (resolve, reject) {
+                    const objs = getAsyncObjectStore();
+                    const request = objs.delete(index || this.currentId);
+                    request.onerror = () => reject(Error('Delete error'));
+                    request.onsuccess = () => {
+                        resolve(request.result);
+                    };;
+                }
+            );
         }
     });
 }

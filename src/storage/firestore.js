@@ -13,8 +13,8 @@ export default (editor, opts = {}) => {
 
     const getDoc = () => doc;
 
-    const getAsyncCollection = (clb) => {
-        if (collection) return clb(collection);
+    const getAsyncCollection = () => {
+        if (collection) return collection;
         if (!firebase.apps.length) {
             firebase.initializeApp({ apiKey, authDomain, projectId, ...opts.firebaseConfig });
             db = firebase.firestore();
@@ -26,26 +26,19 @@ export default (editor, opts = {}) => {
             db.settings(dbSettings);
         }
 
-        const callback = () => {
-            collection = db.collection(opts.objectStoreName);
-            clb(collection);
+        if (opts.enableOffline) {
+            db.enablePersistence().catch(onError);
         }
 
-        callback();
-
-        //if (opts.enableOffline) {
-        //    db.enablePersistence().then(callback).catch(onError);
-        //} else {
-        //    callback();
-        //}
+        collection = db.collection(opts.objectStoreName);
+        return collection;
     };
 
-    const getAsyncDoc = (clb) => {
-        getAsyncCollection(cll => {
-            const cs = editor.Storage.getCurrentStorage();
-            doc = cll.doc(cs.currentId);
-            clb(doc);
-        });
+    const getAsyncDoc = () => {
+        const cll = getAsyncCollection();
+        const cs = editor.Storage.getCurrentStorage();
+        doc = cll.doc(cs.currentId);
+        return doc;
     };
 
     sm.add(storageName, {
@@ -80,67 +73,51 @@ export default (editor, opts = {}) => {
             this.description = description;
         },
 
-        load(keys, clb, clbError) {
-            getAsyncDoc(doc => {
-                doc.get()
-                    .then(doc => {
-                        if (doc.exists) clb(doc.data());
-                        else clb({});
-                    })
-                    .catch(clbError);
-            });
+        async load(keys) {
+            const _doc = getAsyncDoc();
+            const doc = await _doc.get();
+            if (doc.exists) return doc.data();
+            else return {};
         },
 
-        loadAll(clb, clbError) {
-            getAsyncCollection(cll => {
-                cll.get()
-                    .then(docs => {
-                        const data = [];
-                        docs.forEach(doc => data.push(doc.data()));
-                        clb(data);
-                    })
-                    .catch(clbError);
-            });
+        async loadAll() {
+            const cll = getAsyncCollection();
+            const docs = await cll.get();
+            const data = [];
+            docs.forEach(doc => data.push(doc.data()));
+            return data;
         },
 
-        store(data, clb, clbError) {
-            getAsyncCollection(cll => {
-                cll.doc(data.id || this.currentId).set({
-                    id: this.currentId,
-                    name: this.currentName,
-                    template: this.isTemplate,
-                    thumbnail: this.currentThumbnail,
-                    description: this.description,
-                    updated_at: Date(),
-                    ...data
-                })
-                    .then(clb)
-                    .catch(clbError);
+        async store(data) {
+            const cll = getAsyncCollection();
+            const doc = await cll.doc(data.id || this.currentId).set({
+                id: this.currentId,
+                name: this.currentName,
+                template: this.isTemplate,
+                thumbnail: this.currentThumbnail,
+                description: this.description,
+                updated_at: Date(),
+                ...data
             });
+            return doc.data();
         },
 
-        update(data, clb, clbError) {
+        async update(data) {
             const { id, ..._data } = data;
-            getAsyncCollection(cll => {
-                cll.doc(id).set(_data, { merge: true })
-                    .then(clb)
-                    .catch(clbError);
-            });
+            const cll = getAsyncCollection();
+            const doc = await cll.doc(id).set(_data, { merge: true });
+            return doc.data();
         },
 
-        delete(clb, clbError, index) {
+        async delete(index) {
             if (!index) {
-                getAsyncDoc(doc => {
-                    doc.delete()
-                        .then(clb)
-                        .catch(clbError);
-                });
+                const _doc = getAsyncDoc();
+                const doc = await _doc.delete();
+                return doc.data();
             } else {
-                getAsyncCollection(cll => {
-                    cll.doc(index).delete()
-                        .then(clb)
-                        .catch(clbError);
-                });
+                const cll = getAsyncCollection();
+                const doc = await cll.doc(index).delete();
+                return doc.data();
             }
         }
     });
