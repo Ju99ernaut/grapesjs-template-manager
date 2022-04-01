@@ -4,7 +4,7 @@ export default (editor, opts = {}) => {
     const sm = editor.StorageManager;
     const storageName = storageRemote;
     const remote = sm.get('remote');
-    const stOpts = sm.getCurrentOptions('remote')
+    const stOpts = sm.getStorageOptions('remote');
 
     // Add custom storage to the editor
     sm.add(storageName, {
