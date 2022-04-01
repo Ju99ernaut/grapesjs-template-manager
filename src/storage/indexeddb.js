@@ -1,4 +1,4 @@
-import { storageIDB } from '../consts';
+import { storageIDB, helpers } from '../consts';
 
 export default (editor, opts = {}) => {
     let db;
@@ -44,34 +44,10 @@ export default (editor, opts = {}) => {
 
     // Add custom storage to the editor
     sm.add(storageName, {
-        currentName: 'Default',
-        currentId: 'uuidv4',
-        currentThumbnail: '',
-        isTemplate: false,
-        description: 'No description',
+        ...helpers,
         getDb,
 
         getObjectStore,
-
-        setId(id) {
-            this.currentId = id;
-        },
-
-        setName(name) {
-            this.currentName = name;
-        },
-
-        setThumbnail(thumbnail) {
-            this.currentThumbnail = thumbnail;
-        },
-
-        setIsTemplate(isTemplate) {
-            this.isTemplate = !!isTemplate;
-        },
-
-        setDescription(description) {
-            this.description = description;
-        },
 
         async load(keys) {
             return new Promise(

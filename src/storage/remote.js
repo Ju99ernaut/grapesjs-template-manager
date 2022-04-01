@@ -1,55 +1,33 @@
-import { storageRemote } from '../consts';
+import { storageRemote, helpers } from '../consts';
 
 export default (editor, opts = {}) => {
     const sm = editor.StorageManager;
     const storageName = storageRemote;
     const remote = sm.get('remote');
+    const stOpts = sm.getCurrentOptions('remote')
 
     // Add custom storage to the editor
     sm.add(storageName, {
-        currentName: 'Default',
-        currentId: 'uuidv4',
-        currentThumbnail: '',
-        isTemplate: false,
-        description: 'No description',
+        ...helpers,
 
-        setId(id) {
-            this.currentId = id;
-        },
-
-        setName(name) {
-            this.currentName = name;
-        },
-
-        setThumbnail(thumbnail) {
-            this.currentThumbnail = thumbnail;
-        },
-
-        setIsTemplate(isTemplate) {
-            this.isTemplate = !!isTemplate;
-        },
-
-        setDescription(description) {
-            this.description = description;
-        },
-
-        async load(keys) {
-            const urlLoad = remote.get('urlLoad');
+        async load(keys = {}) {
+            const { urlLoad } = stOpts;
             const id = urlLoad.endsWith('/') ? this.currentId : `/${this.currentId}`;
-            remote.set({ urlLoad: urlLoad + id });
-            const projectData = await remote.load(keys);
-            remote.set({ urlLoad });
+            const projectData = await remote.load({
+                ...stOpts,
+                ...{ urlLoad: urlLoad + id },
+                ...keys
+            });
             return projectData;
         },
 
-        async loadAll() {
-            return await remote.load({});
+        async loadAll(keys = {}) {
+            return await remote.load({ ...stOpts, ...keys });
         },
 
-        async store(data) {
-            const urlStore = remote.get('urlStore');
+        async store(data, keys = {}) {
+            const { urlStore } = stOpts;
             const id = urlStore.endsWith('/') ? this.currentId : `/${this.currentId}`;
-            opts.uuidInPath && remote.set({ urlStore: urlStore + id });
             const projectData = await remote.store({
                 id: this.currentId,
                 name: this.currentName,
@@ -58,24 +36,23 @@ export default (editor, opts = {}) => {
                 description: this.description,
                 updated_at: Date(),
                 ...data
+            }, {
+                ...stOpts,
+                ...{ urlStore: opts.uuidInPath ? urlStore + id : urlStore },
+                ...keys
             });
-            remote.set({ urlStore });
             return projectData;
         },
 
         async update(data) {
-            const urlLoad = remote.get('urlLoad');
+            const { urlStore } = stOpts;
             let { id } = data;
-            id = urlLoad.endsWith('/') ? id : `/${id}`;
-            remote.set({ urlLoad: urlLoad + id });
-            const res = await remote.load({});
-            const body = { ...res, ...data };
-            const method = 'post';
-            const urlUpdate = remote.get('urlStore');
-            id = data.id;
-            id = urlUpdate.endsWith('/') ? id : `/${id}`;
-            const projectData = await remote.request(urlUpdate + id, { method, body });
-            remote.set({ urlLoad });
+            id = urlStore.endsWith('/') ? id : `/${id}`;
+            const projectData = await remote.store(data, {
+                ...stOpts,
+                ...{ urlStore: urlStore + id },
+                ...keys
+            });
             return projectData;
         },
 

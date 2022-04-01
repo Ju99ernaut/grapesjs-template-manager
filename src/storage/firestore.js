@@ -1,4 +1,4 @@
-import { storageFireStore } from '../consts';
+import { storageFireStore, helpers } from '../consts';
 
 export default (editor, opts = {}) => {
     const sm = editor.StorageManager;
@@ -42,35 +42,11 @@ export default (editor, opts = {}) => {
     };
 
     sm.add(storageName, {
-        currentName: 'Default',
-        currentId: 'uuidv4',
-        currentThumbnail: '',
-        isTemplate: false,
-        description: 'No description',
+        ...helpers,
         getDoc,
 
         setDocId(id) {
             this.currentId = id;
-        },
-
-        setId(id) {
-            this.currentId = id;
-        },
-
-        setName(name) {
-            this.currentName = name;
-        },
-
-        setThumbnail(thumbnail) {
-            this.currentThumbnail = thumbnail;
-        },
-
-        setIsTemplate(isTemplate) {
-            this.isTemplate = !!isTemplate;
-        },
-
-        setDescription(description) {
-            this.description = description;
         },
 
         async load(keys) {
