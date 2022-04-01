@@ -94,7 +94,6 @@ body, html {
 | `style` | Default style since `fromElement` is not supported | `undefined` |
 | `indexeddbVersion` | IndexedDB schema version | `5` |
 | `onDelete` | On successful template deletion | `Function(Check source)` |
-| `onDeleteError` | On error template deletion | `Function(Check source)` |
 | `onScreenShotError` | On error capturing screenshot | `Function(Check source)` |
 | `quality` | Generated screenshot quality | `.01` |
 | `mdlTitle` | Modal title | `Project Manager` |
@@ -183,11 +182,14 @@ window.editor = grapesjs.init({
   storageManager:  {
     type: 'rest-api',
     // the URIs below can be the same depending on your API design 
-    urlStore: 'https://endpoint/store/',// POST
-    urlLoad: 'https://endpoint/load/',// GET
-    urlDelete: 'https://endpoint/delete/',// DELETE
-    params: { _some_token: '...' },
-    headers: { Authorization: 'Basic ...' }
+    options: {
+      remote: {
+        urlStore: 'https://endpoint/store/',// POST
+        urlLoad: 'https://endpoint/load/',// GET
+        urlDelete: 'https://endpoint/delete/',// DELETE
+        // ...
+      }
+    }
   },
   plugins: ['grapesjs-project-manager'],
   pluginsOpts: {
