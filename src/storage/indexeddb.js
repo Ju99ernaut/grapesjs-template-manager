@@ -85,7 +85,7 @@ export default (editor, opts = {}) => {
                         template: this.isTemplate,
                         thumbnail: this.currentThumbnail,
                         description: this.description,
-                        updated_at: Date(),
+                        updated_at: Date.now(),
                         ...data
                     });
                     request.onerror = () => reject(Error('Store error'));
