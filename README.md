@@ -95,6 +95,7 @@ body, html {
 | `indexeddbVersion` | IndexedDB schema version | `5` |
 | `onDelete` | On successful template deletion | `Function(Check source)` |
 | `onScreenShotError` | On error capturing screenshot | `Function(Check source)` |
+| `onThumbnail` | Handle thumbnail data | `Function(Check source)` |
 | `quality` | Generated screenshot quality | `.01` |
 | `mdlTitle` | Modal title | `Project Manager` |
 | `apiKey` | `Firebase` API key | ` ` |

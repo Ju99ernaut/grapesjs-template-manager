@@ -35,6 +35,13 @@ export default (editor, opts = {}) => {
                 console.log(err)
             },
 
+            // Handle built-in thumbnail generation
+            // By default it just sets the url as the base64 encoded image which may be too large to store in a database
+            // You might want to upload this somewhere
+            onThumbnail(dataUrl, $input) {
+                $input.val(dataUrl);
+            },
+
             // Quality of screenshot image from 0 to 1, more quality increases the image size
             quality: .01,
 
