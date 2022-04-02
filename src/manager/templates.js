@@ -112,7 +112,7 @@ export default class TemplateManager extends UI {
         const { editor, cs } = this;
         const { projectId, nameText } = this.state;
         const id = editor.runCommand('get-uuidv4');
-        const name = nameText || 'New-' + id.substr(0, 8);
+        const name = nameText || 'New-' + id.substring(0, 8);
         const def = {
             id,
             name,
@@ -120,10 +120,10 @@ export default class TemplateManager extends UI {
             thumbnail: '',
             styles: '[]',
             description: 'No description',
+            pages: `[{"id": "${crypto.randomUUID().substring(0, 13)}", "name": "index"}]`,
+            styles: '[]',
+            assets: '[]'
         };
-        def[`${this.id}pages`] = `[{"id": "${crypto.randomUUID().substr(0, 8)}", "name": "index"}]`;
-        def[`${this.id}styles`] = '[]';
-        def[`${this.id}assets`] = '[]';
         if (!projectId) {
             cs.setId(id);
             await cs.store(def);
@@ -182,7 +182,7 @@ export default class TemplateManager extends UI {
         } else if (sortBy === 'updated_at' || sortBy === 'created_at') {
             order = sortByDate(sortBy, sortOrder);
         } else if (sortBy === 'pages') {
-            order = sortByPages(this.id + sortBy, sortOrder);
+            order = sortByPages(sortBy, sortOrder);
         } else if (sortBy === 'size') {
             order = sortBySize(sortOrder);
         }
@@ -221,7 +221,7 @@ export default class TemplateManager extends UI {
                     updated_at
                 } = site;
                 const size = objSize(site);
-                const pages = JSON.parse(site[`${this.id}pages`]);
+                const pages = JSON.parse(site.pages);
                 const time = updated_at ? ago(new Date(updated_at).getTime()) : 'NA';
                 const createdAt = created_at ? ago(new Date(created_at).getTime()) : 'NA';
                 const pageNames = pages.map(page => page.name).join(', ');
