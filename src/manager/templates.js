@@ -157,7 +157,7 @@ export default class TemplateManager extends UI {
     }
 
     handleEdit(data) {
-        this.cs.update({ ...data, updated_at: Date() });
+        this.cs.update({ ...data, updated_at: Date.now() });
     }
 
     async handleDelete(e) {
@@ -222,8 +222,8 @@ export default class TemplateManager extends UI {
                 } = site;
                 const size = objSize(site);
                 const pages = JSON.parse(site.pages);
-                const time = updated_at ? ago(new Date(updated_at).getTime()) : 'NA';
-                const createdAt = created_at ? ago(new Date(created_at).getTime()) : 'NA';
+                const time = updated_at ? ago(updated_at) : 'NA';
+                const createdAt = created_at ? ago(created_at) : 'NA';
                 const pageNames = pages.map(page => page.name).join(', ');
                 return `<div 
                     class="site-wrapper ${cs.currentId === id ? 'open' : ''}" 
