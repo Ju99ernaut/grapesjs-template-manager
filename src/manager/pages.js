@@ -97,7 +97,7 @@ export default class PagesApp extends UI {
 
         return pages.map((page, i) => `<div 
                 data-id="${i}" 
-                data-key="${page.id || page.get('name')}"  
+                data-key="${page.get('private') ? '' : (page.id || page.get('name'))}"  
                 class="page ${isSelected(page) ? 'selected' : ''}"
             >
                 <i class="fa fa-file-o" style="margin:5px;"></i>
