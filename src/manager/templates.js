@@ -157,12 +157,12 @@ export default class TemplateManager extends UI {
     }
 
     handleEdit(data) {
-        this.cs.update({ ...data, updated_at: Date.now() });
+        this.opts.onUpdateAsync(this.cs.update({ ...data, updated_at: Date.now() }));
     }
 
     async handleDelete(e) {
         const { cs, setState, opts } = this;
-        const res = await cs.delete(e.currentTarget.dataset.id);
+        const res = await opts.onDeleteAsync(cs.delete(e.currentTarget.dataset.id));
         opts.onDelete(res);
         const sites = await cs.loadAll();
         setState({ sites })

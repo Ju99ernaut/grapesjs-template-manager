@@ -94,6 +94,8 @@ body, html {
 | `style` | Default style since `fromElement` is not supported | `undefined` |
 | `indexeddbVersion` | IndexedDB schema version | `5` |
 | `onDelete` | On successful template deletion | `Function(Check source)` |
+| `onDeleteAsync` | Handle promise from storage delete | `Function(Check source)` |
+| `onUpdateAsync` | Handle promise from storage update | `Function(Check source)` |
 | `onScreenShotError` | On error capturing screenshot | `Function(Check source)` |
 | `onThumbnail` | Handle thumbnail data | `Function(Check source)` |
 | `quality` | Generated screenshot quality | `.01` |

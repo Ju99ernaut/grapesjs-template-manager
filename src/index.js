@@ -30,6 +30,16 @@ export default (editor, opts = {}) => {
                 console.log('Deleted:', res)
             },
 
+            // Handle promise from delete
+            onDeleteAsync(del) {
+                return del;
+            },
+
+            // Handle promise from update
+            onUpdateAsync(up) {
+                return up;
+            },
+
             // On screenshot error
             onScreenshotError(err) {
                 console.log(err)
