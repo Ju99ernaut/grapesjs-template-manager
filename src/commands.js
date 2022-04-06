@@ -58,7 +58,11 @@ export default (editor, opts = {}) => {
             .catch(err => clbErr && clbErr(err))
     };
 
-    cm.add('get-uuidv4', () => crypto.randomUUID() || uuidv4());
+    cm.add('get-uuidv4', () => {
+        if (crypto) {
+            return crypto.randomUUID ? crypto.randomUUID() : uuidv4();
+        }
+    });
 
     cm.add('take-screenshot', (editor, s, options = { clb(d) { return d } }) => {
         const el = editor.getWrapper().getEl();
