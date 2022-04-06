@@ -40,6 +40,11 @@ export default (editor, opts = {}) => {
                 return up;
             },
 
+            // Handle promise from screenshot
+            onScreenshotAsync(shot) {
+                return shot;
+            },
+
             // On screenshot error
             onScreenshotError(err) {
                 console.log(err)

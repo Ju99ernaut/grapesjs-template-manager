@@ -52,10 +52,13 @@ export default (editor, opts = {}) => {
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     );
 
-    const getJpeg = (node, opts = {}, clb, clbErr) => {
-        domtoimage.toJpeg(node, opts)
-            .then(dataUrl => clb && clb(dataUrl))
-            .catch(err => clbErr && clbErr(err))
+    const getJpeg = async (node, options = {}, clb, clbErr) => {
+        try {
+            const dataUrl = await opts.onScreenshotAsync(domtoimage.toJpeg(node, options));
+            clb && clb(dataUrl);
+        } catch (err) {
+            clbErr && clbErr(err)
+        }
     };
 
     cm.add('get-uuidv4', () => {
