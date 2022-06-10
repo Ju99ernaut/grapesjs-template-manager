@@ -23,7 +23,7 @@ export default (editor, opts = {}) => {
             uuidInPath: true,
 
             // Indexeddb version schema
-            indexeddbVersion: 5,
+            indexeddbVersion: 6,
 
             // When template or page is deleted
             onDelete(res) {

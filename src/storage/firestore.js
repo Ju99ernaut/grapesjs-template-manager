@@ -52,8 +52,7 @@ export default (editor, opts = {}) => {
         async load(keys) {
             const _doc = getAsyncDoc();
             const doc = await _doc.get();
-            if (doc.exists) return doc.data();
-            else return {};
+            return doc.exists ? doc.data() : {};
         },
 
         async loadAll() {
@@ -66,7 +65,7 @@ export default (editor, opts = {}) => {
 
         async store(data) {
             const cll = getAsyncCollection();
-            const doc = await cll.doc(data.id || this.currentId).set({
+            await cll.doc(data.id || this.currentId).set({
                 id: this.currentId,
                 name: this.currentName,
                 template: this.isTemplate,
@@ -75,25 +74,21 @@ export default (editor, opts = {}) => {
                 updated_at: Date.now(),
                 ...data
             });
-            return doc.data();
         },
 
         async update(data) {
             const { id, ..._data } = data;
             const cll = getAsyncCollection();
-            const doc = await cll.doc(id).set(_data, { merge: true });
-            return doc.data();
+            await cll.doc(id).set(_data, { merge: true });
         },
 
         async delete(index) {
             if (!index) {
                 const _doc = getAsyncDoc();
-                const doc = await _doc.delete();
-                return doc.data();
+                await _doc.delete();
             } else {
                 const cll = getAsyncCollection();
-                const doc = await cll.doc(index).delete();
-                return doc.data();
+                await cll.doc(index).delete();
             }
         }
     });

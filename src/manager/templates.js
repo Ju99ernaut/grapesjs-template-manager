@@ -221,7 +221,7 @@ export default class TemplateManager extends UI {
                     updated_at
                 } = site;
                 const size = objSize(site);
-                const pages = JSON.parse(site.pages);
+                const pages = typeof site.pages === 'string' ? JSON.parse(site.pages) : site.pages;
                 const time = updated_at ? ago(updated_at) : 'NA';
                 const createdAt = created_at ? ago(created_at) : 'NA';
                 const pageNames = pages.map(page => page.name).join(', ');
