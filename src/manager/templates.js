@@ -40,7 +40,7 @@ export default class TemplateManager extends UI {
         return objSize(this.state.sites);
     }
 
-    onRender() {
+    async onRender() {
         const { setState, cs } = this;
 
         /* Set request loading state */
@@ -49,14 +49,12 @@ export default class TemplateManager extends UI {
         });
 
         /* Fetch sites from storage API */
-        cs.loadAll(sites => {
-            /* Set sites and turn off loading state */
-            setState({
-                sites,
-                loading: false
-            });
-        },
-            err => console.log("Error", err));
+        const sites = await cs.loadAll();
+        /* Set sites and turn off loading state */
+        setState({
+            sites,
+            loading: false
+        });
     }
 
     handleFilterInput(e) {
@@ -94,7 +92,7 @@ export default class TemplateManager extends UI {
         }
     }
 
-    handleOpen(e) {
+    async handleOpen(e) {
         const { editor, cs } = this;
         const { projectId } = this.state;
         if (!projectId || projectId === cs.currentId) {
@@ -102,20 +100,19 @@ export default class TemplateManager extends UI {
             return;
         }
         cs.setId(projectId);
-        editor.load(res => {
-            cs.setName(res.name);
-            cs.setThumbnail(res.thumbnail || '');
-            cs.setIsTemplate(res.template);
-            cs.setDescription(res.description || 'No description');
-            editor.Modal.close();
-        });
+        const res = await editor.load();
+        cs.setName(res.name);
+        cs.setThumbnail(res.thumbnail || '');
+        cs.setIsTemplate(res.template);
+        cs.setDescription(res.description || 'No description');
+        editor.Modal.close();
     }
 
-    handleCreate(e) {
+    async handleCreate(e) {
         const { editor, cs } = this;
         const { projectId, nameText } = this.state;
         const id = editor.runCommand('get-uuidv4');
-        const name = nameText || 'New-' + id.substr(0, 8);
+        const name = nameText || 'New-' + id.substring(0, 8);
         const def = {
             id,
             name,
@@ -123,32 +120,29 @@ export default class TemplateManager extends UI {
             thumbnail: '',
             styles: '[]',
             description: 'No description',
+            pages: `[{"id": "${crypto.randomUUID().substring(0, 13)}", "name": "index"}]`,
+            styles: '[]',
+            assets: '[]'
         };
-        def[`${this.id}pages`] = `[{"id": "${crypto.randomUUID().substr(0, 8)}", "name": "index"}]`;
-        def[`${this.id}styles`] = '[]';
-        def[`${this.id}assets`] = '[]';
         if (!projectId) {
             cs.setId(id);
-            cs.store(def, res => {
-                cs.setIsTemplate(false);
-                editor.load(res => {
-                    cs.setId(res.id);
-                    cs.setName(res.name);
-                    cs.setThumbnail(res.thumbnail || '');
-                    cs.setDescription(res.description || 'No description');
-                    editor.Modal.close();
-                });
-            });
+            await cs.store(def);
+            cs.setIsTemplate(false);
+            const res = await editor.load();
+            cs.setId(res.id);
+            cs.setName(res.name);
+            cs.setThumbnail(res.thumbnail || '');
+            cs.setDescription(res.description || 'No description');
+            editor.Modal.close();
         } else {
             cs.setId(projectId);
             cs.setIsTemplate(false);
-            editor.load(res => {
-                cs.setId(id);
-                cs.setName(name);
-                cs.setThumbnail(res.thumbnail || '');
-                cs.setDescription(res.description || 'No description');
-                editor.Modal.close();
-            });
+            const res = await editor.load();
+            cs.setId(id);
+            cs.setName(name);
+            cs.setThumbnail(res.thumbnail || '');
+            cs.setDescription(res.description || 'No description');
+            editor.Modal.close();
         }
     }
 
@@ -163,16 +157,15 @@ export default class TemplateManager extends UI {
     }
 
     handleEdit(data) {
-        this.cs.update({ ...data, updated_at: Date() });
+        this.opts.onUpdateAsync(this.cs.update({ ...data, updated_at: Date.now() }));
     }
 
-    handleDelete(e) {
+    async handleDelete(e) {
         const { cs, setState, opts } = this;
-        cs.delete(res => {
-            opts.onDelete(res);
-            cs.loadAll(sites => setState({ sites }),
-                err => console.log("Error", err));
-        }, opts.onDeleteError, e.currentTarget.dataset.id);
+        const res = await opts.onDeleteAsync(cs.delete(e.currentTarget.dataset.id));
+        opts.onDelete(res);
+        const sites = await cs.loadAll();
+        setState({ sites })
     }
 
     renderSiteList() {
@@ -189,7 +182,7 @@ export default class TemplateManager extends UI {
         } else if (sortBy === 'updated_at' || sortBy === 'created_at') {
             order = sortByDate(sortBy, sortOrder);
         } else if (sortBy === 'pages') {
-            order = sortByPages(this.id + sortBy, sortOrder);
+            order = sortByPages(sortBy, sortOrder);
         } else if (sortBy === 'size') {
             order = sortBySize(sortOrder);
         }
@@ -228,9 +221,9 @@ export default class TemplateManager extends UI {
                     updated_at
                 } = site;
                 const size = objSize(site);
-                const pages = JSON.parse(site[`${this.id}pages`]);
-                const time = updated_at ? ago(new Date(updated_at).getTime()) : 'NA';
-                const createdAt = created_at ? ago(new Date(created_at).getTime()) : 'NA';
+                const pages = typeof site.pages === 'string' ? JSON.parse(site.pages) : site.pages;
+                const time = updated_at ? ago(updated_at) : 'NA';
+                const createdAt = created_at ? ago(created_at) : 'NA';
                 const pageNames = pages.map(page => page.name).join(', ');
                 return `<div 
                     class="site-wrapper ${cs.currentId === id ? 'open' : ''}" 

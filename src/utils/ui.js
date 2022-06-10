@@ -3,7 +3,6 @@ export default class UI {
         this.editor = editor;
         this.$ = editor.$;
         this.pfx = editor.getConfig('stylePrefix');
-        this.id = editor.Storage.getConfig().id;
         this.opts = opts;
         this.setState = this.setState.bind(this);
         this.setStateSilent = this.setStateSilent.bind(this);

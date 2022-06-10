@@ -1,87 +1,67 @@
-import { storageRemote } from '../consts';
+import { storageRemote, helpers } from '../consts';
 
 export default (editor, opts = {}) => {
     const sm = editor.StorageManager;
     const storageName = storageRemote;
     const remote = sm.get('remote');
+    const stOpts = sm.getStorageOptions('remote');
 
     // Add custom storage to the editor
     sm.add(storageName, {
-        currentName: 'Default',
-        currentId: 'uuidv4',
-        currentThumbnail: '',
-        isTemplate: false,
-        description: 'No description',
+        ...helpers,
 
-        setId(id) {
-            this.currentId = id;
-        },
-
-        setName(name) {
-            this.currentName = name;
-        },
-
-        setThumbnail(thumbnail) {
-            this.currentThumbnail = thumbnail;
-        },
-
-        setIsTemplate(isTemplate) {
-            this.isTemplate = !!isTemplate;
-        },
-
-        setDescription(description) {
-            this.description = description;
-        },
-
-        load(keys, clb, clbErr) {
-            const urlLoad = remote.get('urlLoad');
+        async load(keys = {}) {
+            const { urlLoad } = stOpts;
             const id = urlLoad.endsWith('/') ? this.currentId : `/${this.currentId}`;
-            remote.set({ urlLoad: urlLoad + id });
-            remote.load(keys, clb, clbErr);
-            remote.set({ urlLoad });
+            const projectData = await remote.load({
+                ...stOpts,
+                ...{ urlLoad: urlLoad + id },
+                ...keys
+            });
+            return projectData;
         },
 
-        loadAll(clb, clbErr) {
-            remote.load({}, clb, clbErr);
+        async loadAll(keys = {}) {
+            return await remote.load({ ...stOpts, ...keys });
         },
 
-        store(data, clb, clbErr) {
-            const urlStore = remote.get('urlStore');
+        async store(data, keys = {}) {
+            const { urlStore } = stOpts;
             const id = urlStore.endsWith('/') ? this.currentId : `/${this.currentId}`;
-            opts.uuidInPath && remote.set({ urlStore: urlStore + id });
-            remote.store({
+            const projectData = await remote.store({
                 id: this.currentId,
                 name: this.currentName,
                 template: this.isTemplate,
                 thumbnail: this.currentThumbnail,
                 description: this.description,
-                updated_at: Date(),
+                updated_at: Date.now(),
                 ...data
-            }, clb, clbErr);
-            remote.set({ urlStore });
+            }, {
+                ...stOpts,
+                ...{ urlStore: opts.uuidInPath ? urlStore + id : urlStore },
+                ...keys
+            });
+            return projectData;
         },
 
-        update(data, clb, clbErr) {
-            const urlLoad = remote.get('urlLoad');
+        async update(data) {
+            const { urlStore } = stOpts;
             let { id } = data;
-            id = urlLoad.endsWith('/') ? id : `/${id}`;
-            remote.set({ urlLoad: urlLoad + id });
-            remote.load({}, res => {
-                const body = { ...res, ...data };
-                const method = 'post';
-                const urlUpdate = remote.get('urlStore');
-                id = data.id;
-                id = urlUpdate.endsWith('/') ? id : `/${id}`;
-                remote.request(urlUpdate + id, { method, body }, clb, clbErr);
-            }, clbErr);
-            remote.set({ urlLoad });
+            id = urlStore.endsWith('/') ? id : `/${id}`;
+            const projectData = await remote.store(data, {
+                ...stOpts,
+                ...{ urlStore: urlStore + id },
+                ...keys
+            });
+            return projectData;
         },
 
-        delete(clb, clbErr, index) {
+        async delete(index) {
             const urlDelete = remote.get('urlDelete');
             let id = index || this.currentId;
             id = urlDelete.endsWith('/') ? id : `/${id}`;
-            remote.request(urlDelete + id, { method: 'delete' }, clb, clbErr);
+            const res = await remote.request(urlDelete + id, { method: 'delete' });
+            return res;
         }
     });
 }
