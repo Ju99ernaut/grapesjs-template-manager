@@ -1,6 +1,6 @@
 # Grapesjs Project Manager
 
-> Requires GrapesJS v0.17.3 or higher.
+> Requires GrapesJS v0.19.4 or higher.
 
 Project, template and page manager for grapesjs. This version makes use of the [`PageManager`](https://github.com/artf/grapesjs/pull/3411) and has different plugin and package name, the previous version which doesn't make use of the `PageManager` can be found [here](https://github.com/Ju99ernaut/grapesjs-template-manager/tree/template-manager).
 
@@ -215,15 +215,15 @@ Returns
       "template": false,
       "thumbnail": "",
       "description": "No description",
-      "gjs-assets": "[]",
-      "gjs-pages": "[]",
-      "gjs-styles": "[]",
+      "assets": "[]",
+      "pages": "[]",
+      "styles": "[]",
       "updated_at": ""
     }
 ]
 ```
 
-`POST` `https://api/templates/{idx: UUIDv4}` store template
+`POST` `https://api/templates/{idx: UUIDv4}` store or update template
 
 Expects
 ```json
@@ -233,9 +233,9 @@ Expects
   "template": false,
   "thumbnail": "",
   "description": "No description",
-  "gjs-assets": "[]",
-  "gjs-pages": "[]",
-  "gjs-styles": "[]",
+  "assets": "[]",
+  "pages": "[]",
+  "styles": "[]",
   "updated_at": ""
 }
 ```
@@ -250,9 +250,9 @@ Returns
   "template": false,
   "thumbnail": "",
   "description": "No description",
-  "gjs-assets": "[]",
-  "gjs-pages": "[]",
-  "gjs-styles": "[]",
+  "assets": "[]",
+  "pages": "[]",
+  "styles": "[]",
   "updated_at": ""
 }
 ```
@@ -267,9 +267,13 @@ window.editor = grapesjs.init({
   storageManager:  {
     type: 'rest-api',
     // the URIs below can be the same depending on your API design 
-    urlStore: 'https://api/templates/',// POST
-    urlLoad: 'https://api/templates/',// GET
-    urlDelete: 'https://api/templates/',// DELETE
+    options:{
+      remote:{
+        urlStore: 'https://api/templates/',// POST
+        urlLoad: 'https://api/templates/',// GET
+        urlDelete: 'https://api/templates/',// DELETE
+      }
+    }
   },
   plugins: ['grapesjs-template-manager'],
   pluginsOpts: {
