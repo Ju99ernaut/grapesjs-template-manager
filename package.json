@@ -1,6 +1,6 @@
 {
     "name": "grapesjs-project-manager",
-    "version": "2.0.3",
+    "version": "2.0.4",
     "description": "Grapesjs Project Manager",
     "main": "dist/grapesjs-project-manager.min.js",
     "repository": {
