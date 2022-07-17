@@ -7,6 +7,8 @@ export default (editor, opts = {}) => {
     const options = {
         ...{
             // default options
+            // Allow migration of projects using deprecated storage prefix
+            legacyPrefix: '',
             // Database name
             dbName: 'gjs',
 
