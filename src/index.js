@@ -138,7 +138,9 @@ export default (editor, opts = {}) => {
                 cs.setName(firstPage.name);
                 cs.setThumbnail(firstPage.thumbnail);
                 cs.setIsTemplate(firstPage.template);
-                editor.load();
+                await editor.load();
+                editor.stopCommand('sw-visibility');
+                editor.runCommand('sw-visibility');
             } else {
                 cs.setId(editor.runCommand('get-uuidv4'));
                 cs.setName(`Default-${cs.currentId.substr(0, 7)}`);
