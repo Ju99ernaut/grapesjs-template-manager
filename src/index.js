@@ -27,6 +27,16 @@ export default (editor, opts = {}) => {
             // Indexeddb version schema
             indexeddbVersion: 6,
 
+            // Confirm delete project
+            confirmDeleteProject() {
+                return confirm('Are you sure to delete this project')
+            },
+
+            // Confirm delete page
+            confirmDeletePage() {
+                return confirm('Are you sure to delete this page')
+            },
+
             // When template or page is deleted
             onDelete(res) {
                 console.log('Deleted:', res)

@@ -52,8 +52,10 @@ export default class PagesApp extends UI {
     }
 
     removePage(e) {
-        this.pm.remove(e.currentTarget.dataset.key);
-        this.update();
+        if (this.opts.confirmDeleteProject()) {
+            this.pm.remove(e.currentTarget.dataset.key);
+            this.update();
+        }
     }
 
     openEdit(e) {

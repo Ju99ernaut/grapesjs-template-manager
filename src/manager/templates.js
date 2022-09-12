@@ -162,10 +162,12 @@ export default class TemplateManager extends UI {
 
     async handleDelete(e) {
         const { cs, setState, opts } = this;
-        const res = await opts.onDeleteAsync(cs.delete(e.currentTarget.dataset.id));
-        opts.onDelete(res);
-        const sites = await cs.loadAll();
-        setState({ sites })
+        if (opts.confirmDeleteProject()) {
+            const res = await opts.onDeleteAsync(cs.delete(e.currentTarget.dataset.id));
+            opts.onDelete(res);
+            const sites = await cs.loadAll();
+            setState({ sites });
+        }
     }
 
     renderSiteList() {
