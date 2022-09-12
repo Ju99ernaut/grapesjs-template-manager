@@ -55,11 +55,11 @@ export default class SettingsApp extends UI {
     }
 
     handleThumbnail(e) {
-        const { editor, $el } = this;
+        const { editor, $el, opts } = this;
         editor.runCommand('take-screenshot', {
             clb(dataUrl) {
                 $el?.find('img').attr('src', dataUrl);
-                this.opts.onThumbnail(dataUrl, $el?.find('input.thumbnail'));
+                opts.onThumbnail(dataUrl, $el?.find('input.thumbnail'));
             }
         })
     }
