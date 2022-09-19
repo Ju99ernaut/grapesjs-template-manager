@@ -57,7 +57,7 @@ export default (editor, opts = {}) => {
         },
 
         async delete(index) {
-            const urlDelete = remote.get('urlDelete');
+            const { urlDelete } = stOpts;
             let id = index || this.currentId;
             id = urlDelete.endsWith('/') ? id : `/${id}`;
             const res = await remote.request(urlDelete + id, { method: 'delete' });
