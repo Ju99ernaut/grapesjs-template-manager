@@ -56,11 +56,11 @@ export default (editor, opts = {}) => {
             return projectData;
         },
 
-        async delete(index) {
+        async delete(index, keys = {}) {
             const { urlDelete } = stOpts;
             let id = index || this.currentId;
             id = urlDelete.endsWith('/') ? id : `/${id}`;
-            const res = await remote.request(urlDelete + id, { method: 'delete' });
+            const res = await remote.request(urlDelete + id, { method: 'delete', ...keys });
             return res;
         }
     });

@@ -168,8 +168,13 @@ export default class TemplateManager extends UI {
     async handleDelete(e) {
         const { cs, setState, opts } = this;
         if (opts.confirmDeleteProject()) {
-            const res = await opts.onDeleteAsync(cs.delete(e.currentTarget.dataset.id));
-            opts.onDelete(res);
+            const toDel = e.currentTarget.dataset.id;
+            if (typeof opts.delete === 'function') {
+                opts.delete(toDel)
+            } else {
+                const res = await opts.onDeleteAsync(cs.delete(toDel));
+                opts.onDelete(res);
+            }
             const sites = await cs.loadAll();
             setState({ sites });
         }

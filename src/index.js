@@ -27,6 +27,9 @@ export default (editor, opts = {}) => {
             // Indexeddb version schema
             indexeddbVersion: 6,
 
+            // Custom delete function
+            delete: false,
+
             // Confirm delete project
             confirmDeleteProject() {
                 return confirm('Are you sure to delete this project')
