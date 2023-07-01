@@ -157,7 +157,12 @@ export default class TemplateManager extends UI {
     }
 
     handleEdit(data) {
-        this.opts.onUpdateAsync(this.cs.update({ ...data, updated_at: Date.now() }));
+        const { opts, cs, editor } = this;
+        if (typeof opts.update === 'function') {
+            opts.update({ ...data, updated_at: Date.now() }, editor);
+        } else {
+            opts.onUpdateAsync(cs.update({ ...data, updated_at: Date.now() }));
+        }
     }
 
     async handleDelete(e) {

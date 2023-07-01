@@ -47,6 +47,9 @@ export default (editor, opts = {}) => {
                 return del;
             },
 
+            // Custom update function
+            update: false,
+
             // Handle promise from update
             onUpdateAsync(up) {
                 return up;

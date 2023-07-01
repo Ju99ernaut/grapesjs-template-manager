@@ -44,7 +44,7 @@ export default (editor, opts = {}) => {
             return projectData;
         },
 
-        async update(data) {
+        async update(data, keys = {}) {
             const { urlStore } = stOpts;
             let { id } = data;
             id = urlStore.endsWith('/') ? id : `/${id}`;
